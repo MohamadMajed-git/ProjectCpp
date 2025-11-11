@@ -62,6 +62,16 @@ class SLL{
         cout<<endl;
     }
 
+    void R(){
+        print(head);
+    }
+    void print(Node *node){
+        if(node==nullptr){
+            return;
+        }
+        print (node->next);
+        cout<<node->data<<" ";
+    }
 
 
 };
@@ -73,8 +83,8 @@ int main(){
     s1.InsertAtB(20);
     s1.InsertByIndex(1,15);
     s1.display();
-    
 
+    s1.R();
 
     return 0;
 }
