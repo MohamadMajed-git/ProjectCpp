@@ -204,34 +204,6 @@ crow::SimpleApp app;
              username = "hello " + username + " welcome to cpp server";
              response2["message"] = username;
              return crow::response(200, response2);
-
-            //  LargeNum ln;
-            //  ln.addLargeNum("123456789123456789", "9876543210123456789");
-            //  cout << "Result of addition: ";
-            //  int *result = ln.displayResult();
-            //  int size = ln.getResultSize();
-            //  std::string sumString = "";
-
-            //  if (result != nullptr)
-            //  {
-            //      for (int i = 0; i < size; i++)
-            //      {
-            //          sumString += std::to_string(result[i]);
-            //      }
-            //  }
-            //  // 4. إرجاع رد (response) بنجاح
-            //  crow::json::wvalue response;
-            //  response["status"] = "success";
-            //  response["summation"] = sumString;
-            //  response["received_userr"] = username;
-
-            //  std::cout << "Received POST request with user: " << username << std::endl;
-
-            //  if (result != nullptr)
-            //  {
-            //      delete[] result; // <-- !! تحرير الذاكرة !!
-            //  }
-            //  return crow::response(200, response);
          });
 
 
