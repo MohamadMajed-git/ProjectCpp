@@ -273,7 +273,7 @@ crow::SimpleApp app;
     std::cout << "Starting Crow server on port 8000..." << std::endl;
 
     // تشغيل الخادم على بورت 8000
-    app.bindaddr("127.0.0.1").port(8000).multithreaded().run();
+    app.bindaddr("0.0.0.0").port(10000).multithreaded().run();
 
     return 0;
 }
