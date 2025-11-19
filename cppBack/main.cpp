@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include "crow.h"
-#include "crow/middlewares/cors.h"
 #include "Classes/SDLL.hpp"
 
 using namespace std;
