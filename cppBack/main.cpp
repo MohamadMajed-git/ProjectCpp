@@ -4,7 +4,15 @@
 #include <iostream>
 #include "crow.h"
 #include "crow/middlewares/cors.h"
+#include "Classes/SDLL.hpp"
+
 using namespace std;
+using namespace crow;
+SLL userList;
+
+
+
+
 // mohammad fork
 class Stack
 {
@@ -159,6 +167,8 @@ public:
 
 int main()
 {
+    
+
 crow::SimpleApp app;
 
     CROW_ROUTE(app, "/")
@@ -173,11 +183,11 @@ crow::SimpleApp app;
         response["status"] = 200;
         return response; });
 
-    // --- !! فانكشن استقبال البوست الجديدة !! ---
-    // هذه النقطة تستمع لطلبات POST فقط على /receive_json
+
+
     CROW_ROUTE(app, "/api/submit")
-        .methods("POST"_method) // تحديد أن هذا المسار لـ POST
-        ([](const crow::request &req)
+        .methods("POST"_method) 
+        ([](const request &req)
          {
              // 1. قراءة الـ body القادم من الطلب وتحويله إلى JSON
              crow::json::rvalue data = crow::json::load(req.body);
@@ -209,7 +219,7 @@ crow::SimpleApp app;
 
     CROW_ROUTE(app, "/api/sum")
         .methods("POST"_method)
-        ([](const crow::request &req){
+        ([](const request &req){
             crow::json::rvalue data = crow::json::load(req.body);
             if (!data)
             {
@@ -233,6 +243,33 @@ crow::SimpleApp app;
             response["sum"] = sumString;
             return crow::response(200, response);
         });
+
+    CROW_ROUTE(app,"/api/signup")
+        .methods("POST"_method)
+        ([](const crow::request &req){
+            json::rvalue data =json::load(req.body);
+            if (!data){
+                return response(400,"Invalid JSON");
+            }
+            userList.insertAtB(data["firstName"].s(),
+                               data["lastName"].s(),
+                               data["nationalID"].s(),
+                               data["birthdate"].s(),
+                               data["email"].s(),
+                               data["phone"].s(),
+                               data["password"].s(),
+                               data["address"].s(),
+                               data["job"].s(),
+                               data["accountType"].s());
+            json::wvalue response;
+            response["status"]="success";
+            userList.display();
+            return crow::response(200,response);
+
+
+
+        });
+
 
     std::cout << "Starting Crow server on port 8000..." << std::endl;
 
