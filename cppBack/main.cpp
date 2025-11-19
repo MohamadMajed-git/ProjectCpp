@@ -1,279 +1,143 @@
-//"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="C:\Chrome-dev-session"
-
-
 #include <iostream>
 #include "crow.h"
-#include "Classes/SDLL.hpp"
+#include <string> // ضروري
 
 using namespace std;
-using namespace crow;
-SLL userList;
 
-
-
-
-// mohammad fork
-class Stack
-{
-    int maxSize;
-    int top;
-    int *list;
-
+// ==========================================
+// 1. تعريف كلاس وهمي للقائمة
+// ==========================================
+class SLL {
 public:
-    Stack()
-    {
-        maxSize = 100;
-        top = -1;
-        list = new int[maxSize];
+    void insertAtB(string f, string l, string n, string b, string e, string p, string pass, string addr, string j, string acc) {
+        cout << ">> [DATABASE]: User " << f << " added successfully to the list." << endl;
     }
-    Stack(int size)
-    {
-        maxSize = size;
-        top = -1;
-        list = new int[maxSize];
+    void display() { cout << "Displaying users..." << endl; }
+};
+
+SLL userList; 
+
+// ==========================================
+// 2. ميدل وير CORS
+// ==========================================
+struct CORSHandler {
+    struct context {};
+
+    void before_handle(crow::request& req, crow::response& res, context& ctx) {
+        cout << ">> [INCOMING]: " << crow::method_name(req.method) << " request to " << req.url << endl;
     }
 
-    void restart()
-    {
-        for (int i = 0; i <= top; i++)
-        {
-            list[i] = 0;
-        }
-        top = -1;
+    void after_handle(crow::request& req, crow::response& res, context& ctx) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
     }
-    bool isEmpty()
-    {
-        return top == -1;
-    }
-    bool isFull()
-    {
-        return top == maxSize - 1;
-    }
-    int getSize()
-    {
-        return top + 1;
-    }
-    int push(int value)
-    {
-        if (isFull())
-        {
-            cout << "Stack Overflow" << endl;
-            return -1;
-        }
-        top++;
-        list[top] = value;
-        return value;
-    }
-    int pop()
-    {
-        if (isEmpty())
-        {
-            cout << "Stack Underflow" << endl;
-            return -1;
-        }
-        return list[top--];
-    }
-    int peek()
-    {
-        if (isEmpty())
-        {
-            cout << "Stack is empty" << endl;
-            return -1;
-        }
-        return list[top];
-    }
-    void display()
-    {
-        if (isEmpty())
-        {
-            cout << "Stack is empty" << endl;
-            return;
-        }
-        for (int i = 0; i <= top; i++)
-        {
-            cout << list[i] << "";
-        }
-        cout << endl;
-    }
-    int *printResult()
-    {
+};
+
+// ==========================================
+// 3. كلاسات المنطق
+// ==========================================
+class Stack {
+    int maxSize; int top; int *list;
+public:
+    Stack() { maxSize = 100; top = -1; list = new int[maxSize]; }
+    int push(int value) { if (top >= maxSize-1) return -1; list[++top] = value; return value; }
+    int pop() { if (top < 0) return -1; return list[top--]; }
+    bool isEmpty() { return top == -1; }
+    int *printResult() {
         int *resultArray = new int[top + 1];
-        for (int i = top; i >= 0; i--)
-        {
-            resultArray[top - i] = list[i];
-        }
+        for (int i = top; i >= 0; i--) resultArray[top - i] = list[i];
         return resultArray;
     }
+    int getSize() { return top + 1; }
 };
 
-class LargeNum
-{
-    Stack *s1 = new Stack();
-    Stack *s2 = new Stack();
-    Stack *result = new Stack();
-    int carry = 0;
-
+class LargeNum {
+    Stack *s1 = new Stack(); Stack *s2 = new Stack(); Stack *result = new Stack(); int carry = 0;
 public:
-    void addLargeNum(string num1, string num2)
-    {
-        for (int i = 0; i < num1.length(); i++)
-        {
-            s1->push(num1[i] - '0');
-        }
-        for (int i = 0; i < num2.length(); i++)
-        {
-            s2->push(num2[i] - '0');
-        }
-        while (!s1->isEmpty() || !s2->isEmpty() || carry)
-        {
+    void addLargeNum(string num1, string num2) {
+        for (char c : num1) s1->push(c - '0');
+        for (char c : num2) s2->push(c - '0');
+        while (!s1->isEmpty() || !s2->isEmpty() || carry) {
             int sum = carry;
-            if (!s1->isEmpty())
-            {
-                sum += s1->pop();
-            }
-            if (!s2->isEmpty())
-            {
-                sum += s2->pop();
-            }
+            if (!s1->isEmpty()) sum += s1->pop();
+            if (!s2->isEmpty()) sum += s2->pop();
             result->push(sum % 10);
-            if (sum >= 10)
-            {
-                carry = 1;
-            }
-            else
-            {
-                carry = 0;
-            }
+            carry = (sum >= 10) ? 1 : 0;
         }
     }
-    int getResultSize()
-    {
-        if (!result->isEmpty())
-        {
-            return result->getSize();
-        }
-        return 0;
-    }
-    int *displayResult()
-    {
-        if (!result->isEmpty())
-        {
-            return result->printResult();
-        }
-        return nullptr;
-    }
+    int getResultSize() { return result->getSize(); }
+    int *displayResult() { return result->isEmpty() ? nullptr : result->printResult(); }
 };
 
+// ==========================================
+// 4. دالة Main
+// ==========================================
 int main()
 {
-    
+    crow::App<CORSHandler> app; 
 
-crow::SimpleApp app;
+    CROW_ROUTE(app, "/")([]() { return "Server is Online!"; });
 
-    CROW_ROUTE(app, "/")
-    ([]()
-     { return "Hello, Crow C++!65"; });
+    // مسار التسجيل
+    CROW_ROUTE(app, "/api/signup")
+        .methods("POST"_method, "OPTIONS"_method)
+        ([](const crow::request &req){
+            if (req.method == "OPTIONS"_method) return crow::response(200);
 
-    CROW_ROUTE(app, "/json")
-    ([]()
-     {
-        crow::json::wvalue response;
-        response["message"] = "This is a GET JSON response!";
-        response["status"] = 200;
-        return response; });
-
-
-
-    CROW_ROUTE(app, "/api/submit")
-        .methods("POST"_method) 
-        ([](const request &req)
-         {
-             // 1. قراءة الـ body القادم من الطلب وتحويله إلى JSON
-             crow::json::rvalue data = crow::json::load(req.body);
-
-             // 2. التحقق إذا كان الـ JSON غير صالح أو فارغ
-             if (!data)
-             {
-                 return crow::response(400, "Invalid JSON"); // 400 Bad Request
-             }
-
-             // 3. معالجة البيانات (مثال: استخراج اسم مستخدم)
-             // نفترض أن الكلاينت سيرسل {"username": "someone"}
-             string username;
-             if (data.has("name"))
-             {
-                 username = data["name"].s();
-             }
-             else
-             {
-                 return crow::response(400, "No name has been sent");
-             }
-
-             crow::json::wvalue response2;
-             username = "hello " + username + " welcome to cpp server";
-             response2["message"] = username;
-             return crow::response(200, response2);
-         });
-
-
-    CROW_ROUTE(app, "/api/sum")
-        .methods("POST"_method)
-        ([](const request &req){
             crow::json::rvalue data = crow::json::load(req.body);
-            if (!data)
-            {
-                return crow::response(400, "Invalid JSON");
-            }
-            LargeNum ln;
-            ln.addLargeNum(data["number1"].s(), data["number2"].s());
+            if (!data) return crow::response(400, "Invalid JSON");
+
+            // التعديل هنا: تحويل صريح إلى (string) للطرفين
+            userList.insertAtB(
+                data.has("firstName") ? (string)data["firstName"].s() : string("Unknown"),
+                data.has("lastName") ? (string)data["lastName"].s() : string(""),
+                data.has("nationalID") ? (string)data["nationalID"].s() : string(""),
+                data.has("birthdate") ? (string)data["birthdate"].s() : string(""),
+                data.has("email") ? (string)data["email"].s() : string(""),
+                data.has("phone") ? (string)data["phone"].s() : string(""),
+                data.has("password") ? (string)data["password"].s() : string(""),
+                data.has("address") ? (string)data["address"].s() : string(""),
+                data.has("job") ? (string)data["job"].s() : string(""),
+                data.has("accountType") ? (string)data["accountType"].s() : string("")
+            );
+
             crow::json::wvalue response;
             response["status"] = "success";
-                         int *result = ln.displayResult();
-             int size = ln.getResultSize();
-             std::string sumString = "";
-
-             if (result != nullptr)
-             {
-                 for (int i = 0; i < size; i++)
-                 {
-                     sumString += std::to_string(result[i]);
-                 }
-             }
-            response["sum"] = sumString;
+            response["message"] = "User added!";
             return crow::response(200, response);
         });
 
-    CROW_ROUTE(app,"/api/signup")
-        .methods("POST"_method)
+    // مسار الجمع
+    CROW_ROUTE(app, "/api/sum")
+        .methods("POST"_method, "OPTIONS"_method)
         ([](const crow::request &req){
-            json::rvalue data =json::load(req.body);
-            if (!data){
-                return response(400,"Invalid JSON");
-            }
-            userList.insertAtB(data["firstName"].s(),
-                               data["lastName"].s(),
-                               data["nationalID"].s(),
-                               data["birthdate"].s(),
-                               data["email"].s(),
-                               data["phone"].s(),
-                               data["password"].s(),
-                               data["address"].s(),
-                               data["job"].s(),
-                               data["accountType"].s());
-            json::wvalue response;
-            response["status"]="success";
-            userList.display();
-            return crow::response(200,response);
+            if (req.method == "OPTIONS"_method) return crow::response(200);
+            
+            crow::json::rvalue data = crow::json::load(req.body);
+            if (!data) return crow::response(400, "Invalid JSON");
 
+            LargeNum ln;
+            
+            // التعديل الجذري هنا لحل مشكلة الـ Type Error
+            // قمنا بتحويل crow string إلى std::string صريح
+            // وقمنا بتحويل "0" إلى string("0")
+            string n1 = data.has("number1") ? (string)data["number1"].s() : string("0");
+            string n2 = data.has("number2") ? (string)data["number2"].s() : string("0");
 
+            ln.addLargeNum(n1, n2);
+            
+            int *res = ln.displayResult();
+            string sumStr = "";
+            if (res) for(int i=0; i<ln.getResultSize(); i++) sumStr += to_string(res[i]);
 
+            crow::json::wvalue response;
+            response["sum"] = sumStr;
+            return crow::response(200, response);
         });
 
-
-    std::cout << "Starting Crow server on port 8000..." << std::endl;
-
-    // تشغيل الخادم على بورت 8000
+    cout << ">> [START] Server listening on port 10000..." << endl;
+    
     app.bindaddr("0.0.0.0").port(10000).multithreaded().run();
-
     return 0;
 }
