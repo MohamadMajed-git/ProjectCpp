@@ -16,8 +16,8 @@ void connectToDatabase(){
     const char* pass=std::getenv("DB_PASS") ? std::getenv("DB_PASS") : "";
     const char* dbname="bank-system";
     unsigned int port=25739;
-    // const char* hostsname="db-avnbank-do-user-13724540-0.b.db.ondigitalocean.com";
-    // const char* user="doadmin";
+    // const char* hostsname="mysql-cpp-project-momolovmomolov12343211-1949.e.aivencloud.com";
+    // const char* user="avnadmin";
     // const char* pass="";
     // const char* dbname="bank-system";
     // unsigned int port=25739;
