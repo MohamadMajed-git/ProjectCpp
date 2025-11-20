@@ -1,25 +1,25 @@
-# 1. استخدام أوبونتو كأساس
+# 1. استخدام أوبونتو
 FROM ubuntu:latest
 
-# 2. تحديث النظام وتثبيت المترجم ومكتبات MariaDB/MySQL
+# 2. تحديث النظام وتثبيت المترجم ومكتبات MariaDB
+# حذفنا wget لأننا لم نعد نحتاجه
 RUN apt-get update && apt-get install -y \
     g++ \
     build-essential \
-    wget \
     libmariadb-dev \
     libssl-dev
 
 # 3. تحديد مجلد العمل
 WORKDIR /app
 
-# 4. تحميل مكتبة Crow (احتياطياً في حال لم تكن موجودة محلياً)
-RUN wget https://github.com/CrowCpp/Crow/releases/download/v1.0+5/crow_all.h -O crow.h
+# (تم حذف خطوة تحميل Crow من هنا)
+# سنعتمد على الملفات الموجودة في مجلد libs الذي سينسخ في الخطوة التالية
 
-# 5. نسخ جميع ملفات المشروع إلى السيرفر
+# 4. نسخ ملفات المشروع (بما فيها مجلد libs)
 COPY . .
 
-# 6. تجميع الكود (الخطوة الحاسمة)
-# لاحظ: قمنا بتضمين Classes/*.cpp لحل مشكلة الـ Linker
+# 5. تجميع الكود
+# بما أنك نسخت libs، المترجم سيجد Crow داخل ./libs/crow
 RUN g++ -o my_server *.cpp Classes/*.cpp \
     -std=c++17 \
     -I. \
@@ -28,8 +28,8 @@ RUN g++ -o my_server *.cpp Classes/*.cpp \
     -lpthread -lmariadb \
     -DCROW_USE_STANDALONE_ASIO
 
-# 7. فتح البورت
+# 6. فتح البورت
 EXPOSE 10000
 
-# 8. أمر التشغيل
+# 7. التشغيل
 CMD ["./my_server"]
