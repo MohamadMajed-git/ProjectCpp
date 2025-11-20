@@ -1,85 +1,49 @@
 #include <iostream>
 #include "crow.h"
-#include <string> // ضروري
-
+#include <string>
+#include "Classes/SDLL.hpp"
+#include <mysql.h>
 using namespace std;
 
-// ==========================================
-// 1. تعريف كلاس وهمي للقائمة
-// ==========================================
-class SLL {
-public:
-    void insertAtB(string f, string l, string n, string b, string e, string p, string pass, string addr, string j, string acc) {
-        cout << ">> [DATABASE]: User " << f << " added successfully to the list." << endl;
-    }
-    void display() { cout << "Displaying users..." << endl; }
-};
-
 SLL userList; 
+MYSQL* conn;
 
-// ==========================================
-// 2. ميدل وير CORS
-// ==========================================
-struct CORSHandler {
-    struct context {};
-
-    void before_handle(crow::request& req, crow::response& res, context& ctx) {
-        cout << ">> [INCOMING]: " << crow::method_name(req.method) << " request to " << req.url << endl;
-    }
-
-    void after_handle(crow::request& req, crow::response& res, context& ctx) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-    }
-};
-
-// ==========================================
-// 3. كلاسات المنطق
-// ==========================================
-class Stack {
-    int maxSize; int top; int *list;
-public:
-    Stack() { maxSize = 100; top = -1; list = new int[maxSize]; }
-    int push(int value) { if (top >= maxSize-1) return -1; list[++top] = value; return value; }
-    int pop() { if (top < 0) return -1; return list[top--]; }
-    bool isEmpty() { return top == -1; }
-    int *printResult() {
-        int *resultArray = new int[top + 1];
-        for (int i = top; i >= 0; i--) resultArray[top - i] = list[i];
-        return resultArray;
-    }
-    int getSize() { return top + 1; }
-};
-
-class LargeNum {
-    Stack *s1 = new Stack(); Stack *s2 = new Stack(); Stack *result = new Stack(); int carry = 0;
-public:
-    void addLargeNum(string num1, string num2) {
-        for (char c : num1) s1->push(c - '0');
-        for (char c : num2) s2->push(c - '0');
-        while (!s1->isEmpty() || !s2->isEmpty() || carry) {
-            int sum = carry;
-            if (!s1->isEmpty()) sum += s1->pop();
-            if (!s2->isEmpty()) sum += s2->pop();
-            result->push(sum % 10);
-            carry = (sum >= 10) ? 1 : 0;
-        }
-    }
-    int getResultSize() { return result->getSize(); }
-    int *displayResult() { return result->isEmpty() ? nullptr : result->printResult(); }
-};
-
-// ==========================================
-// 4. دالة Main
-// ==========================================
 int main()
 {
-    crow::App<CORSHandler> app; 
+    conn = mysql_init(0);
+    const char* ca_path = "ca.pem"; 
+    mysql_options(conn, MYSQL_OPT_SSL_CA, ca_path);
+    if(conn ==nullptr){
+        cout<<"MySQL Initialization Failed"<<endl;
+        return 1;
+    }
+    const char* hostsname=getenv("DB_HOST") ? getenv("DB_HOST") : "db-avnbank-do-user-13724540-0.b.db.ondigitalocean.com";
+    const char* user=getenv("DB_USER") ? getenv("DB_USER") : "doadmin";
+    const char* pass=std::getenv("DB_PASS") ? std::getenv("DB_PASS") : "";
+    const char* dbname="bank-system";
+    unsigned int port=25739;
+    if(mysql_real_connect(conn,hostsname,user,pass,dbname,port,NULL,0)){
+        cout<<"Connected to database successfully"<<endl;
+    }
+    else{
+        cout<<"Connection to database failed"<<endl;
+        cout << "Error Details: " << mysql_error(conn) << endl;
+        return 1;
+    }
+
+
+
+
+
+
+
+
+
+
+    crow::SimpleApp app; 
 
     CROW_ROUTE(app, "/")([]() { return "Server is Online!"; });
 
-    // مسار التسجيل
     CROW_ROUTE(app, "/api/signup")
         .methods("POST"_method, "OPTIONS"_method)
         ([](const crow::request &req){
@@ -87,8 +51,17 @@ int main()
 
             crow::json::rvalue data = crow::json::load(req.body);
             if (!data) return crow::response(400, "Invalid JSON");
+            string fName   = data.has("firstName")   ? data["firstName"].s()   : (string)"Unknown";
+            string lName   = data.has("lastName")    ? data["lastName"].s()    : (string)"";
+            string natID   = data.has("nationalID")  ? data["nationalID"].s()  : (string)"";
+            string bDate   = data.has("birthdate")   ? data["birthdate"].s()   : (string)"";
+            string email   = data.has("email")       ? data["email"].s()       : (string)"";
+            string phone   = data.has("phone")       ? data["phone"].s()       : (string)"";
+            string pass    = data.has("password")    ? data["password"].s()    : (string)"";
+            string addr    = data.has("address")     ? data["address"].s()     : (string)"";
+            string job     = data.has("job")         ? data["job"].s()         : (string)"";
+            string accType = data.has("accountType") ? data["accountType"].s() : (string)"";
 
-            // التعديل هنا: تحويل صريح إلى (string) للطرفين
             userList.insertAtB(
                 data.has("firstName") ? (string)data["firstName"].s() : string("Unknown"),
                 data.has("lastName") ? (string)data["lastName"].s() : string(""),
@@ -101,43 +74,38 @@ int main()
                 data.has("job") ? (string)data["job"].s() : string(""),
                 data.has("accountType") ? (string)data["accountType"].s() : string("")
             );
-
+            string query ="INSERT INTO users (fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType) VALUES ('" 
+                + fName + "', '"
+                + lName + "', '"
+                + natID + "', '"
+                + bDate + "', '"
+                + email + "', '"
+                + phone + "', '"
+                + pass + "', '"
+                + addr + "', '"
+                + job + "', '"
+                + accType + "')";
+                if(mysql_query(conn,query.c_str())==0){
             crow::json::wvalue response;
             response["status"] = "success";
             response["message"] = "User added!";
             return crow::response(200, response);
+                }
+                else{
+                    string errorMsg = mysql_error(conn);
+                    cout << "MySQL Query Error: " << errorMsg << endl;
+                    crow::json::wvalue response;
+                    response["status"] = "error";
+                    response["message"] = "User not added!"+errorMsg;
+                    return crow::response(400, response);
+                }
+
         });
 
-    // مسار الجمع
-    CROW_ROUTE(app, "/api/sum")
-        .methods("POST"_method, "OPTIONS"_method)
-        ([](const crow::request &req){
-            if (req.method == "OPTIONS"_method) return crow::response(200);
-            
-            crow::json::rvalue data = crow::json::load(req.body);
-            if (!data) return crow::response(400, "Invalid JSON");
-
-            LargeNum ln;
-            
-            // التعديل الجذري هنا لحل مشكلة الـ Type Error
-            // قمنا بتحويل crow string إلى std::string صريح
-            // وقمنا بتحويل "0" إلى string("0")
-            string n1 = data.has("number1") ? (string)data["number1"].s() : string("0");
-            string n2 = data.has("number2") ? (string)data["number2"].s() : string("0");
-
-            ln.addLargeNum(n1, n2);
-            
-            int *res = ln.displayResult();
-            string sumStr = "";
-            if (res) for(int i=0; i<ln.getResultSize(); i++) sumStr += to_string(res[i]);
-
-            crow::json::wvalue response;
-            response["sum"] = sumStr;
-            return crow::response(200, response);
-        });
 
     cout << ">> [START] Server listening on port 10000..." << endl;
     
     app.bindaddr("0.0.0.0").port(10000).multithreaded().run();
+    mysql_close(conn);
     return 0;
 }

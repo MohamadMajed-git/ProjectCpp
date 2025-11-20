@@ -8,11 +8,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  // إعدادات السيرفر والبروكسي لحل مشكلة CORS
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:10000', // رابط سيرفر C++
+        target: 'http://localhost:10000', 
         changeOrigin: true,
         secure: false,
       }

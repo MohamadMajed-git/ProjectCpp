@@ -3,7 +3,7 @@ import SignupImage from "../assets/signup Image.png";
 import { 
   User, Mail, Lock, Phone, MapPin, 
   CreditCard, Briefcase, Calendar, 
-  ArrowRight, ArrowLeft, CheckCircle 
+  ArrowRight, ArrowLeft, CheckCircle ,
 } from "lucide-react";
 import axiosClient from "../axiosClient";
 
@@ -45,7 +45,7 @@ export default function Signup() {
         console.error("Signup Error:", error);
     });
     console.log("User Data Collected:", userData);
-    alert("Account Created! Check Console for data.");
+
   };
 
   return (
