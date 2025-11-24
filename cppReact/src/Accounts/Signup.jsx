@@ -49,9 +49,9 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex w-full h-screen bg-gray-50 overflow-hidden">
+    <div className="flex  w-full h-screen bg-gray-50 overflow-hidden">
         
-      <div className="hidden lg:flex w-1/2 h-full relative">
+      <div className="hidden lg:flex w-1/2 h-full relative ">
         <div className="absolute inset-0 bg-blue-900/20 z-10" /> 
         <img 
           src={SignupImage} 
@@ -107,7 +107,7 @@ export default function Signup() {
                 </div>
 
                  <button 
-                    onClick={() => setProgress(60)} 
+                    onClick={() => setProgress(60)}  
                     className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
                  >
                     Next Step <ArrowRight size={20} />

@@ -6,6 +6,8 @@
 #include "globals.hpp"
 #include "routes.hpp"
 #include "Classes/SDLL.hpp"
+#include "readData.hpp"
+
 using namespace std;
 
 SLL userList; 
@@ -13,8 +15,8 @@ MYSQL* conn;
 
 int main()
 {
-   
     connectToDatabase();
+    readAllDataFromDatabase();
     crow::SimpleApp app; 
     setupRoutes(app);
 
