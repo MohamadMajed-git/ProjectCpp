@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const axiosClient = axios.create({
-    baseURL: "api",
+    baseURL: "/api",
 });
 
 export default axiosClient;

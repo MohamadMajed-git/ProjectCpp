@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SignupImage from "../assets/signup Image.png"; 
 import { 
   User, Mail, Lock, Phone, MapPin, 
@@ -6,6 +6,8 @@ import {
   ArrowRight, ArrowLeft, CheckCircle ,
 } from "lucide-react";
 import axiosClient from "../axiosClient";
+import { useNavigate } from "react-router-dom";
+import { useStateContext } from "../context/ContextProvider";
 
 export default function Signup() {
   const [progress, setProgress] = useState(30);
@@ -22,6 +24,16 @@ export default function Signup() {
   const address = useRef("");
   const job = useRef("");
   const accountType = useRef("");
+
+  const navigate = useNavigate();
+  const {token}=useStateContext();
+    useEffect(()=>{
+        if(token){
+            navigate('/admin/admin-home');
+        }
+    },[])
+
+
 
   // Function to handle final submission
   const handleSignup = () => {
@@ -170,10 +182,15 @@ export default function Signup() {
             </div>
 
           </div>
-          
+          <div className="flex justify-center items-center space-x-2">
+
           <p className="text-center text-gray-500 text-sm">
-            Already have an account? <a href="#" className="text-blue-700 font-bold hover:underline">Log in</a>
+            Already have an account? 
           </p>
+
+                    <button onClick={()=>navigate("/login")} className="text-blue-700 cursor-pointer font-bold hover:underline">Login</button>
+
+          </div>
 
         </div>
       </div>

@@ -4,34 +4,58 @@ import Home from "./Home";
 import Signup from "./Accounts/Signup";
 import Branches from "./pages/Branches";
 import Login from "./Accounts/Login";
-
+import AHome from "./AdminPages/AHome";
+import GuestLayout from "./component/GuestLayout";
+import Guest from "./Guest/Guest";
+import ADefaultLayout from "./component/ADefaultLayout";
 
 const router = createBrowserRouter([
+    
     {
         path: "/",
-        element:<DefaultLayout/>,
+        element: <GuestLayout />,
         children: [
             {
                 path: "/",
-                element: <Home/>
-            },{
-                path: "/branches",
+                element: <Guest />
+            },
+        ]
+    },
+    {
+        path: "/",
+        element: <DefaultLayout />,
+        children: [
+            {
+                path: "home",
+                element: <Home />
+            }, {
+                path: "branches",
                 element: <Branches />
             }
         ]
     },
     {
-        path:"/signup",
-        element: <Signup/>
+        path: "/admin",
+        element: <ADefaultLayout />,
+        children: [
+            {
+                path: "admin-home",
+                element: <AHome />
+            }
+        ]
     },
     {
-        path:"/login",
-        element: <Login/>
+        path: "/signup",
+        element: <Signup />
     },
     {
-                path: "/branches",
-                element: <Branches />
-            },
+        path: "/login",
+        element: <Login />
+    },
+    {
+        path: "/branches",
+        element: <Branches />
+    },
     {
         path: "*",
         element: <div className="flex items-center justify-center h-[90vh]"><h1 className="text-6xl  font-bold text-red-600">Not Found 404</h1></div>

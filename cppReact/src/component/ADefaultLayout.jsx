@@ -2,9 +2,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
 import { useEffect } from "react";
 
-export default function DefaultLayout() {
-  const navigate=useNavigate();
-  const {setUser,setToken}=useStateContext();
+export default function ADefaultLayout() {
+    const navigate=useNavigate();
+  const {user,setUser,setToken}=useStateContext();
   const handleLogout=()=>{
     setUser(null);
     setToken(null);
@@ -14,9 +14,12 @@ export default function DefaultLayout() {
     if(!localStorage.getItem('ACCESS_TOKEN')){
       navigate('/login');
     }
+    if(user&&user.nationalID!="123456789123"){
+      navigate('/');
+    }
   },[])
-
-  return (
+  
+    return (
     <>
     <div className="p-4 border-b border-gray-300">
       <header className="flex justify-between items-center">

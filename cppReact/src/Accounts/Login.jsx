@@ -1,15 +1,27 @@
 import { User } from "lucide-react";
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import signupImage from "../assets/signup Image.png";
 import axiosClient from "../axiosClient";
 import { useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
 export default function Login() {
-    const {setUser,setToken}=useStateContext();
+    const {token,setUser,setToken}=useStateContext();
     const [error, setError] = useState("");
     const password = useRef("");
     const email = useRef("");
     const navigate = useNavigate();
+
+    
+    useEffect(()=>{
+        if(token){
+            navigate('/admin/admin-home');
+        }
+    },[])
+    
+    
+    
+    
+    
     const handleSubmit=()=>{
         const userData={
             email: email.current?.value,
@@ -17,8 +29,9 @@ export default function Login() {
         };
         axiosClient.post('/login',userData)
         .then(response=>{
-            setUser(response.user);
-            setToken(response.token);
+            console.log(response);
+            setUser(response.data.user);
+            setToken(response.data.token);
             navigate('/');
         }).catch(()=>{
             setError("Invalid email or password");
@@ -61,6 +74,13 @@ export default function Login() {
                     >
                         Login
                     </button>
+                    <div className="flex justify-center items-center space-x-2">
+
+                              <p className="text-center text-gray-500 text-sm">
+            Don't have an account? 
+          </p>
+          <button onClick={()=>navigate("/signup")} className="text-blue-700  cursor-pointer font-bold hover:underline">Signup</button>
+                    </div>
 
                 </div>
             </div>

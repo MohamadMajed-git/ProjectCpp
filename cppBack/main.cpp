@@ -7,14 +7,17 @@
 #include "routes.hpp"
 #include "Classes/SDLL.hpp"
 #include "readData.hpp"
+#include "Classes/QActivateAccounts.hpp"
 
 using namespace std;
 
 SLL userList; 
+QActivateAccounts activateAccounts;
 MYSQL* conn;
 
 int main()
 {
+    
     connectToDatabase();
     readAllDataFromDatabase();
     crow::SimpleApp app; 

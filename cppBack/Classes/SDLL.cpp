@@ -43,19 +43,33 @@ void SLL::display()
         cur = cur->next;
     }
 }
-string SLL::validateLogin(string email, string password)
+string* SLL::validateLogin(string email, string password)
 {
     Node *cur = head;
+    
     while (cur != nullptr)
     {
         if (cur->email == email && cur->password == password)
         {
             cur->token = generateToken();
-            return cur->token;
+            string *lst=new string[11];
+            lst[0]=(string)cur->name1;
+            lst[1]=(string)cur->name2;
+            lst[2]=(string)cur->nationalID;
+            lst[3]=(string)cur->birthdate;
+            lst[4]=(string)cur->email;
+            lst[5]=(string)cur->phone;
+            lst[6]=(string)cur->password;
+            lst[7]=(string)cur->address;
+            lst[8]=(string)cur->job;
+            lst[9]=(string)cur->accountType;
+            lst[10]=(string)cur->token;
+            return lst;
+            
         }
         cur = cur->next;
     }
-    return "";
+    return nullptr;
 }
 
 

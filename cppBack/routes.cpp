@@ -52,12 +52,11 @@ void setupRoutes(crow::SimpleApp &app)
                                                               data.has("accountType") ? (string)data["accountType"].s() : string(""));
                                                             string tokenQuery="UPDATE users SET token = '" + token + "' WHERE email = '" + email + "'";
                                                             if(mysql_query(conn,tokenQuery.c_str())==0){
-
+                                                                activateAccounts.addAccount(fName+lName, email, "12/10");
                                                             
                                                             crow::json::wvalue response;
                                                           response["status"] = "success";
                                                           response["message"] = "User added!";
-                                                          response["token"] = token;
                                                           return crow::response(200, response);
                                                         }
                                                         else{
@@ -84,24 +83,36 @@ void setupRoutes(crow::SimpleApp &app)
         .methods("POST"_method, "OPTIONS"_method)([](const request &req)
                                                   {
         if (req.method == "OPTIONS"_method) return crow::response(200);
-        string token;
+        
         json::rvalue data =json::load(req.body);
         if(!data)return response(400,"Invalid JSON");
 
-        token=userList.validateLogin(
+        string* userData=userList.validateLogin(
             data.has("email")?(string)data["email"].s():(string)"",
             data.has("password")?(string)data["password"].s():(string)""
         );
 
-        if(token !=""){
-                    string tokenQuery="UPDATE users SET token = '" + token + "' WHERE email = '" + (data.has("email")?(string)data["email"].s():(string)"")+"'";
+        if(userData !=nullptr){
+                    string tokenQuery="UPDATE users SET token = '" + userData[10] + "' WHERE email = '" + (data.has("email")?(string)data["email"].s():(string)"")+"'";
                     if(mysql_query(conn,tokenQuery.c_str())==0){
 
                         json::wvalue response;
                         response["status"]="success";
                         response["message"]="Login successful";
-                        response["user"]={""};
-                        response["token"] = token;
+                        response["user"]={
+                            {"firstName",userData[0]},
+                            {"lastName",userData[1]},
+                            {"nationalID",userData[2]},
+                            {"birthdate",userData[3]},
+                            {"email",userData[4]},
+                            {"phone",userData[5]},
+                            {"password",userData[6]},
+                            {"address",userData[7]},
+                            {"job",userData[8]},
+                            {"accountType",userData[9]}
+                        };
+                        response["token"] = userData[10];
+                        delete[] userData;
                         return crow::response(200,response);
                          }
                         else{
@@ -110,6 +121,7 @@ void setupRoutes(crow::SimpleApp &app)
                             crow::json::wvalue response;
                             response["status"] = "error";
                             response["message"] = "somthing went wrong" + errorMsg;
+                            delete[] userData;
                             return crow::response(400, response);
                         }
         }
@@ -119,5 +131,19 @@ void setupRoutes(crow::SimpleApp &app)
             response["message"]="Invalid email or password";
             return crow::response(401,response);
         } });
+
+
+
+
+
+    CROW_ROUTE(app, "/api/holded-accounts")
+        .methods("GET"_method, "OPTIONS"_method)([](const request &req)
+                                                {
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+        json::wvalue response;
+        response["accounts"] = activateAccounts.getAccountsJSON();
+        return crow::response(200, response); 
+                                                    
+    });
     
 }

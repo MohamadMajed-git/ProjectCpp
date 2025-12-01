@@ -27,11 +27,22 @@ void readAllDataFromDatabase(){
         }
         mysql_free_result(res);
         userList.display();
-
-
-
     }
     else{
         cout<<"Query Execution Problem!"<<endl;
+    }
+    int qstate2=mysql_query(conn,"SELECT * FROM users WHERE status = 'hold'");
+    if(!qstate2){// all team member qstate will return 0 if the query is successful
+        res=mysql_store_result(conn);
+        string name;
+        while((row=mysql_fetch_row(res)))
+        {
+            
+            activateAccounts.addAccount(row[1],row[7],row[15]);
+        }
+        mysql_free_result(res);
+    }
+    else{
+        cout<<"Query Execution Problem!2"<< mysql_error(conn) << endl;
     }
 }
