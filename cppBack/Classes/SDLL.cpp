@@ -1,11 +1,12 @@
 #include "SDLL.hpp"
+#include "../globals.hpp"
 #include <iostream>
 #include <string>
 #include <random>
 
 using namespace std;
 
-string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType)
+string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate)
 {
     Node *newNode = new Node();
     newNode->name1 = name1;
@@ -18,6 +19,9 @@ string SLL::insertAtB(string name1, string name2, string nationalID, string birt
     newNode->address = address;
     newNode->job = job;
     newNode->accountType = accountType;
+    newNode->balance = 0;
+    newNode->status ="hold";
+    newNode->createAt = currentDate;
     newNode->token = generateToken();
 
     if (head == nullptr)
@@ -52,7 +56,7 @@ string* SLL::validateLogin(string email, string password)
         if (cur->email == email && cur->password == password)
         {
             cur->token = generateToken();
-            string *lst=new string[11];
+            string *lst=new string[14];
             lst[0]=(string)cur->name1;
             lst[1]=(string)cur->name2;
             lst[2]=(string)cur->nationalID;
@@ -64,6 +68,9 @@ string* SLL::validateLogin(string email, string password)
             lst[8]=(string)cur->job;
             lst[9]=(string)cur->accountType;
             lst[10]=(string)cur->token;
+            lst[11]=(string)cur->createAt;
+            lst[12]=(string)cur->status;
+            lst[13]=to_string(cur->balance);
             return lst;
             
         }
@@ -73,6 +80,33 @@ string* SLL::validateLogin(string email, string password)
 }
 
 
+void SLL::deleteNodeByEmail(string email) {
+    if(isEmpty()){
+        return;
+    }
+    Node *cur = head;
+    Node *prev = nullptr;
+    while (cur != nullptr) {
+        if (cur->email == email) {
+            if (cur == head) {
+                head = cur->next;
+            } else {
+                prev->next = cur->next;
+            }
+            if (cur == tail) {
+                tail = prev;
+            }
+            delete cur;
+            return;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+}
+
+bool SLL::isEmpty() {
+    return head == nullptr;
+}
 
 
 

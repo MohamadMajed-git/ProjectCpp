@@ -15,6 +15,9 @@ class SLL{
         string job;
         string accountType;
         string token;
+        string createAt;
+        string status;
+        int balance;
         Node *next=nullptr;
 
     };
@@ -25,10 +28,12 @@ class SLL{
         head=nullptr;
         tail=nullptr;
     }
-    string insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType);
+    string insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate);
     string* validateLogin(string email, string password);//linearr search for email and password
+    void deleteNodeByEmail(string email);
     Node* getNodeByEmail(string email);
     string generateToken();
     void insertToken(string email);
+    bool isEmpty();
     void display();
 };

@@ -8,6 +8,10 @@
 #include "Classes/SDLL.hpp"
 #include "readData.hpp"
 #include "Classes/QActivateAccounts.hpp"
+#include <time.h> //time library
+#include <iomanip> //for put_time
+#include <sstream>// to convert time to string
+
 
 using namespace std;
 
@@ -31,3 +35,6 @@ int main()
     mysql_close(conn);
     return 0;
 }
+
+
+

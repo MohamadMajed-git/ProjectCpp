@@ -35,8 +35,8 @@ void setupRoutes(crow::SimpleApp &app)
                                                       string addr = data.has("address") ? data["address"].s() : (string) "";
                                                       string job = data.has("job") ? data["job"].s() : (string) "";
                                                       string accType = data.has("accountType") ? data["accountType"].s() : (string) "";
-
-                                                      string query = "INSERT INTO users (fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType) VALUES ('" + fName + "', '" + lName + "', '" + natID + "', '" + bDate + "', '" + email + "', '" + phone + "', '" + pass + "', '" + addr + "', '" + job + "', '" + accType + "')";
+                                                      string createAt=currentDate();
+                                                      string query = "INSERT INTO users (fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt) VALUES ('" + fName + "', '" + lName + "', '" + natID + "', '" + bDate + "', '" + email + "', '" + phone + "', '" + pass + "', '" + addr + "', '" + job + "', '" + accType + "', '" + createAt + "')";
                                                       if (mysql_query(conn, query.c_str()) == 0)
                                                       {
                                                           string token = userList.insertAtB(
@@ -49,10 +49,12 @@ void setupRoutes(crow::SimpleApp &app)
                                                               data.has("password") ? (string)data["password"].s() : string(""),
                                                               data.has("address") ? (string)data["address"].s() : string(""),
                                                               data.has("job") ? (string)data["job"].s() : string(""),
-                                                              data.has("accountType") ? (string)data["accountType"].s() : string(""));
+                                                              data.has("accountType") ? (string)data["accountType"].s() : string(""),
+                                                              createAt
+                                                            );
                                                             string tokenQuery="UPDATE users SET token = '" + token + "' WHERE email = '" + email + "'";
                                                             if(mysql_query(conn,tokenQuery.c_str())==0){
-                                                                activateAccounts.addAccount(fName+lName, email, "12/10");
+                                                                activateAccounts.addAccount(fName+" "+lName, email, createAt);
                                                             
                                                             crow::json::wvalue response;
                                                           response["status"] = "success";
@@ -144,6 +146,51 @@ void setupRoutes(crow::SimpleApp &app)
         response["accounts"] = activateAccounts.getAccountsJSON();
         return crow::response(200, response); 
                                                     
+    });
+
+
+    CROW_ROUTE(app, "/api/holded-accounts/activate")
+    .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+    {
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+        string email = activateAccounts.getFront();
+        activateAccounts.removeAccount();
+        userList.getNodeByEmail(email)->status = "active";
+        string query = "UPDATE users SET status = 'active' WHERE email = '" + email + "'";
+        if(mysql_query(conn, query.c_str()) != 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        json::wvalue response;
+        response["status"] = "success";
+        return crow::response(200, response);
+    });
+
+    CROW_ROUTE(app, "/api/holded-accounts/delete")
+    .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+    {
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+        string email = activateAccounts.getFront();
+        string query = "DELETE FROM users WHERE email = '" + email + "'";
+        if(mysql_query(conn, query.c_str()) != 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        activateAccounts.removeAccount();
+        userList.deleteNodeByEmail(email);
+        json::wvalue response;
+        response["status"] = "success";
+        return crow::response(200, response);
     });
     
 }

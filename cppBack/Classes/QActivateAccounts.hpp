@@ -19,6 +19,8 @@ public:
     void addAccount(string name, string email, string creationDate);
     void removeAccount();
     crow::json::wvalue getAccountsJSON();
+    string getFront();
+    bool isEmpty();
 
 
     

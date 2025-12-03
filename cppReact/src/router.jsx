@@ -8,6 +8,7 @@ import AHome from "./AdminPages/AHome";
 import GuestLayout from "./component/GuestLayout";
 import Guest from "./Guest/Guest";
 import ADefaultLayout from "./component/ADefaultLayout";
+import HoldedAccounts from "./AdminPages/HoldedAccounts";
 
 const router = createBrowserRouter([
     
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
             {
                 path: "admin-home",
                 element: <AHome />
+            },
+            {
+                path: "holded-accounts",
+                element: <HoldedAccounts />
             }
         ]
     },

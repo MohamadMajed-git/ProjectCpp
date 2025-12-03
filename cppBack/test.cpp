@@ -1,6 +1,7 @@
 // #include <iostream>
-
-
+// #include <time.h>
+// #include <iomanip>
+// #include <sstream> 
 // using namespace std;
 
 // int main() {
@@ -11,8 +12,12 @@
 //         // }
 //         // cout<<token<<endl;
 
-//         string lst[3];
-//         lst=["a","b","c"];
+//         time_t t =time(NULL);
+//         tm date=*localtime(&t);
+//         stringstream ss;
+//         ss<<put_time(&date, "%Y-%m-%d %H:%M:%S");
+//         string finalDate=ss.str();
+//         cout<<finalDate<<endl;
         
 
 //     return 0;

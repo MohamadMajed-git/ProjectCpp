@@ -28,10 +28,15 @@ void QActivateAccounts::addAccount(string name, string email, string creationDat
 }
 
 void QActivateAccounts::removeAccount(){
+    if(isEmpty()) return;
     Node *temp=front;
     front=front->next;
+    if (front == nullptr) {
+        back = nullptr;
+    }
     delete temp;
 }
+
 
 crow::json::wvalue QActivateAccounts::getAccountsJSON(){
     vector<crow::json::wvalue> accountsList;
@@ -45,4 +50,13 @@ crow::json::wvalue QActivateAccounts::getAccountsJSON(){
         temp=temp->next;
     }
     return crow::json::wvalue(accountsList);
+}
+
+bool QActivateAccounts::isEmpty(){
+    return front==nullptr;
+}
+
+string QActivateAccounts::getFront(){
+    if(isEmpty()) return "";
+    return front->email;
 }
