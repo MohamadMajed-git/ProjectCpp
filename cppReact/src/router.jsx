@@ -9,6 +9,7 @@ import GuestLayout from "./component/GuestLayout";
 import Guest from "./Guest/Guest";
 import ADefaultLayout from "./component/ADefaultLayout";
 import HoldedAccounts from "./AdminPages/HoldedAccounts";
+import ABranches from "./AdminPages/ABranches";
 
 const router = createBrowserRouter([
     
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
                 path: "/",
                 element: <Guest />
             },
+            {
+                path: "/branches",
+                element: <Branches />
+            }
         ]
     },
     {
@@ -46,6 +51,10 @@ const router = createBrowserRouter([
             {
                 path: "holded-accounts",
                 element: <HoldedAccounts />
+            },
+            {
+                path: "branches",
+                element:<ABranches />
             }
         ]
     },

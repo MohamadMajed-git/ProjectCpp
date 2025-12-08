@@ -3,10 +3,11 @@
 #include <iostream>
 #include <string>
 #include <random>
+#include <vector>
 
 using namespace std;
 
-string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,int balance)
+string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,int balance,string accountNumber)
 {
     Node *newNode = new Node();
     newNode->name1 = name1;
@@ -22,6 +23,7 @@ string SLL::insertAtB(string name1, string name2, string nationalID, string birt
     newNode->balance = balance;
     newNode->status ="hold";
     newNode->createAt = currentDate;
+    newNode->accountNumber=accountNumber;
     newNode->token = generateToken();
 
     if (head == nullptr)
@@ -136,18 +138,49 @@ string SLL::generateToken()
     return token;
 }
 
+string SLL::generateRandomInteger(int length)
+{
+    string numbers="0123456789";
+    string result="";
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dis(0,numbers.size()-1);
+    for(int i=0;i<length;i++){
+        result+=numbers[dis(gen)];
+    }
+    return result;
+}
+
+string SLL::createAccountNumber(string accountType){
+    string randomPart=generateRandomInteger(7);
+    string accoutType=(accountType=="savings")?"SAVINGS":"CURRENT";
+    string accoutNumber =accoutType + randomPart;
+    return accoutNumber;
+}
 
 
 
-int SLL::getBalanceByEmail(string email){
+
+
+crow::json::wvalue SLL::getDataByEmail(string email){
+    if(isEmpty()){
+        return crow::json::wvalue({{"message","List is empty"}});
+    }
+    crow::json::wvalue userData;
     Node* cur=head;
     while(cur!=nullptr){
         if(cur->email==email){
-            return cur->balance;    
+            userData["name1"]=cur->name1;
+            userData["name2"]=cur->name2;
+            userData["nationalID"]=cur->nationalID;
+            userData["email"]=cur->email;
+            userData["balance"]=cur->balance;
+            userData["accountNumber"]=cur->accountNumber;
+            return userData;
             }
             cur=cur->next;
     }
-    return -1;
+    return crow::json::wvalue({{"message","User not found"}});
 }
 
 

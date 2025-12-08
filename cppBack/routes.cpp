@@ -37,7 +37,8 @@ void setupRoutes(crow::SimpleApp &app)
                                                       string accType = data.has("accountType") ? data["accountType"].s() : (string) "";
                                                       string createAt=currentDate();
                                                       int balance=0;
-                                                      string query = "INSERT INTO users (fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt) VALUES ('" + fName + "', '" + lName + "', '" + natID + "', '" + bDate + "', '" + email + "', '" + phone + "', '" + pass + "', '" + addr + "', '" + job + "', '" + accType + "', '" + createAt + "')";
+                                                      string accountNumber=userList.createAccountNumber(accType);
+                                                      string query = "INSERT INTO users (fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt,accountNumber) VALUES ('" + fName + "', '" + lName + "', '" + natID + "', '" + bDate + "', '" + email + "', '" + phone + "', '" + pass + "', '" + addr + "', '" + job + "', '" + accType + "', '" + createAt + "', '" + accountNumber + "')";
                                                       if (mysql_query(conn, query.c_str()) == 0)
                                                       {
                                                           string token = userList.insertAtB(
@@ -52,7 +53,8 @@ void setupRoutes(crow::SimpleApp &app)
                                                               data.has("job") ? (string)data["job"].s() : string(""),
                                                               data.has("accountType") ? (string)data["accountType"].s() : string(""),
                                                               createAt,
-                                                              balance
+                                                              balance,
+                                                              accountNumber
                                                             );
                                                             string tokenQuery="UPDATE users SET token = '" + token + "' WHERE email = '" + email + "'";
                                                             if(mysql_query(conn,tokenQuery.c_str())==0){
@@ -200,7 +202,7 @@ void setupRoutes(crow::SimpleApp &app)
 
 
 
-    CROW_ROUTE(app,"/api/get-balance")
+    CROW_ROUTE(app,"/api/get-user-data")
     .methods("POST"_method,"OPTIONS"_method)
     ([](const request &req){
         if (req.method == "OPTIONS"_method) return crow::response(200);
@@ -209,9 +211,9 @@ void setupRoutes(crow::SimpleApp &app)
         if(!data)return response(400,"Invalid JSON");
 
         string email=data.has("email")?(string)data["email"].s():(string)"";
-        int balance=userList.getBalanceByEmail(email);
+        
         json::wvalue response;
-        response["balance"]=balance;
+        response["user"]=userList.getDataByEmail(email);
         return crow::response(200,response);
 
 

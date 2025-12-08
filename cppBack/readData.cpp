@@ -9,7 +9,7 @@ void readAllDataFromDatabase(){
     MYSQL_ROW row;
     MYSQL_RES* res;
     int balance=0;
-    int qstate=mysql_query(conn,"SELECT fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt,balance FROM users");
+    int qstate=mysql_query(conn,"SELECT fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt,balance,accountNumber FROM users");
     if(!qstate){// all team member qstate will return 0 if the query is successful
         res=mysql_store_result(conn);
         while((row=mysql_fetch_row(res))){
@@ -26,14 +26,15 @@ void readAllDataFromDatabase(){
                 row[8],
                 row[9],
                 row[10],
-                balance
+                balance,
+                row[12]
             );
         }
         mysql_free_result(res);
         userList.display();
     }
     else{
-        cout<<"Query Execution Problem!"<<endl;
+        cout<<"Query userlist Execution Problem!"<<endl;
     }
     int qstate2=mysql_query(conn,"SELECT fname, lname, email, createAt FROM users WHERE status = 'hold'");
     if(!qstate2){// all team member qstate will return 0 if the query is successful
@@ -49,7 +50,7 @@ void readAllDataFromDatabase(){
         mysql_free_result(res);
     }
     else{
-        cout<<"Query Execution Problem!2"<< mysql_error(conn) << endl;
+        cout<<"Query activateAccounts  Execution Problem!2"<< mysql_error(conn) << endl;
     }
 }
 
