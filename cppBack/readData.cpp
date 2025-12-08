@@ -8,10 +8,12 @@ using namespace std;
 void readAllDataFromDatabase(){
     MYSQL_ROW row;
     MYSQL_RES* res;
-    int qstate=mysql_query(conn,"SELECT fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt FROM users");
+    int balance=0;
+    int qstate=mysql_query(conn,"SELECT fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt,balance FROM users");
     if(!qstate){// all team member qstate will return 0 if the query is successful
         res=mysql_store_result(conn);
         while((row=mysql_fetch_row(res))){
+             balance=row[11]?std::stoi(row[11]):0;
             userList.insertAtB(
                 row[0],
                 row[1],
@@ -23,7 +25,8 @@ void readAllDataFromDatabase(){
                 row[7],
                 row[8],
                 row[9],
-                row[10]
+                row[10],
+                balance
             );
         }
         mysql_free_result(res);
@@ -49,3 +52,4 @@ void readAllDataFromDatabase(){
         cout<<"Query Execution Problem!2"<< mysql_error(conn) << endl;
     }
 }
+

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate)
+string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,int balance)
 {
     Node *newNode = new Node();
     newNode->name1 = name1;
@@ -19,7 +19,7 @@ string SLL::insertAtB(string name1, string name2, string nationalID, string birt
     newNode->address = address;
     newNode->job = job;
     newNode->accountType = accountType;
-    newNode->balance = 0;
+    newNode->balance = balance;
     newNode->status ="hold";
     newNode->createAt = currentDate;
     newNode->token = generateToken();
@@ -50,7 +50,7 @@ void SLL::display()
 string* SLL::validateLogin(string email, string password)
 {
     Node *cur = head;
-    
+   
     while (cur != nullptr)
     {
         if (cur->email == email && cur->password == password)
@@ -72,7 +72,7 @@ string* SLL::validateLogin(string email, string password)
             lst[12]=(string)cur->status;
             lst[13]=to_string(cur->balance);
             return lst;
-            
+           
         }
         cur = cur->next;
     }
@@ -135,3 +135,20 @@ string SLL::generateToken()
     }
     return token;
 }
+
+
+
+
+int SLL::getBalanceByEmail(string email){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            return cur->balance;    
+            }
+            cur=cur->next;
+    }
+    return -1;
+}
+
+
+
