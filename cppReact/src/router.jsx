@@ -10,9 +10,13 @@ import Guest from "./Guest/Guest";
 import ADefaultLayout from "./component/ADefaultLayout";
 import HoldedAccounts from "./AdminPages/HoldedAccounts";
 import ABranches from "./AdminPages/ABranches";
+import SendMoney from "./pages/SendMoney";
+import UserTransaction from "./pages/UserTransaction";
+import AAllTransaction from "./AdminPages/AAllTransaction";
+import Loan from "./pages/Loan";
 
 const router = createBrowserRouter([
-    
+
     {
         path: "/",
         element: <GuestLayout />,
@@ -37,6 +41,18 @@ const router = createBrowserRouter([
             }, {
                 path: "branches",
                 element: <Branches />
+            },
+            {
+                path: "send-money",
+                element: <SendMoney />
+            },
+            {
+                path: "user-transaction",
+                element: <UserTransaction />
+            },
+            {
+                path: "loan-request",
+                element: <Loan />
             }
         ]
     },
@@ -54,7 +70,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "branches",
-                element:<ABranches />
+                element: <ABranches />
+            },
+            {
+                path: "all-transactions",
+                element: <AAllTransaction />
             }
         ]
     },

@@ -6,6 +6,7 @@
 #include "globals.hpp"
 #include "routes.hpp"
 #include "Classes/SDLL.hpp"
+#include "Classes/TransactionDLL.hpp"
 #include "readData.hpp"
 #include "Classes/QActivateAccounts.hpp"
 #include <time.h> //time library
@@ -14,16 +15,21 @@
 
 
 using namespace std;
-
+//mohammad
 SLL userList; 
+TransactionDLL transactionList;
 QActivateAccounts activateAccounts;
 MYSQL* conn;
 
+//yossef
+LoanSLL LoanSSL;
+LoanQueue LoanQ;
 int main()
 {
     
     connectToDatabase();
     readAllDataFromDatabase();
+    readAllLoansFromDatabase();
     crow::SimpleApp app; 
     setupRoutes(app);
 

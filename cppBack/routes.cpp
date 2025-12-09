@@ -11,6 +11,9 @@ using namespace crow;
 void setupRoutes(crow::SimpleApp &app)
 {
 
+
+
+    //!MOOOOOHHHHAAAAMMMMAAAADDDDD
     CROW_ROUTE(app, "/")([]()
                          { return "Server is Online!"; });
     CROW_ROUTE(app, "/signup")([]()
@@ -82,12 +85,11 @@ void setupRoutes(crow::SimpleApp &app)
                                                           crow::json::wvalue response;
                                                           response["status"] = "error";
                                                           response["message"] = "User not added!" + errorMsg;
-                                                          return crow::response(400, response);
-                                                      } });
+                                                          return crow::response(400, response);}
+    });
 
     CROW_ROUTE(app, "/api/login")
-        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
-                                                  {
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req){
         if (req.method == "OPTIONS"_method) return crow::response(200);
        
         json::rvalue data =json::load(req.body);
@@ -115,7 +117,8 @@ void setupRoutes(crow::SimpleApp &app)
                             {"password",userData[6]},
                             {"address",userData[7]},
                             {"job",userData[8]},
-                            {"accountType",userData[9]}
+                            {"accountType",userData[9]},
+                            {"accountNumber",userData[14]}
                         };
                         response["token"] = userData[10];
                         delete[] userData;
@@ -218,6 +221,145 @@ void setupRoutes(crow::SimpleApp &app)
 
 
     });
+
+
+    CROW_ROUTE(app,"/api/send-money")
+    .methods("POST"_method,"OPTIONS"_method)
+    ([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+        json::rvalue data=json::load(req.body);
+        if(!data)return response(400,"Invalid JSON");
+        string senderAccountNumber=data.has("senderAccountNumber")?(string)data["senderAccountNumber"].s():(string)"";
+        int amount=data.has("amount")?stoi((string)data["amount"].s()):0;
+        string receiverAccountNumber=data.has("receiverAccountNumber")?(string)data["receiverAccountNumber"].s():(string)"";
+        bool status=userList.sendMoney(senderAccountNumber, receiverAccountNumber, amount);
+        if(status==false){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "Transaction failed";
+            return crow::response(400, response);
+        }
+        string query = "UPDATE users SET balance = balance - " + to_string(amount) + " WHERE accountNumber = '" + senderAccountNumber + "'";
+        if(mysql_query(conn, query.c_str()) != 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        query = "UPDATE users SET balance = balance + " + to_string(amount) + " WHERE accountNumber = '" + receiverAccountNumber + "'";
+        if(mysql_query(conn, query.c_str()) != 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        query = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('" + senderAccountNumber + "', '" + receiverAccountNumber + "', " + to_string(amount) + ", '" + currentDate() + "')";
+        if(mysql_query(conn, query.c_str()) != 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        query = "SELECT id FROM transactions WHERE senderAccount = '" + senderAccountNumber + "' AND receiverAccount = '" + receiverAccountNumber + "' AND amount = " + to_string(amount) + " ORDER BY id DESC LIMIT 1";
+        if(!mysql_query(conn, query.c_str()))
+        {
+            MYSQL_RES* res = mysql_store_result(conn);
+            MYSQL_ROW row = mysql_fetch_row(res);
+            int transactionId = stoi(row[0]);
+            transactionList.insertTransaction(transactionId, senderAccountNumber, receiverAccountNumber, amount, currentDate());
+            mysql_free_result(res);
+        }
+        json::wvalue response;
+        response["status"] = "success";
+        return crow::response(200, response);
+    });
+
+
+
+
+
+    CROW_ROUTE(app,"/api/user-transaction")
+    .methods("POST"_method,"OPTIONS"_method)
+    ([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+
+        json::rvalue data=json::load(req.body);
+        if(!data)return response(400,"Invalid JSON");
+
+        string accountNumber=data.has("accountNumber")?(string)data["accountNumber"].s():(string)"";
+        json::wvalue response;
+        response["transactions"]=transactionList.getUserTransactions(accountNumber);
+        return crow::response(200,response);
+    });
+        
+
+
+    CROW_ROUTE(app,"/api/all-transactions")
+    .methods("GET"_method,"OPTIONS"_method)
+    ([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+
+        json::wvalue response;
+        response["transactions"]=transactionList.getAllTransactions();
+        return crow::response(200,response);
+    });
+
+
+
+
+
+
+
+
+
+//! yoooooooooooooooosssssssssseeeeeffff
+
+    CROW_ROUTE(app,"/api/submit-loan-request")
+    .methods("POST"_method,"OPTIONS"_method)([](const request &req){
+                if (req.method == "OPTIONS"_method) return crow::response(200);
+                json::rvalue data=json::load(req.body);
+            if(!data)return response(400,"Invalid JSON");
+            string email=data.has("email")?(string)data["email"].s():(string)"";
+            string duration=data.has("duration")?(string)data["duration"].s():(string)"";
+            int money=data.has("moneyOfLoan")?(int)data["moneyOfLoan"]:0;
+            if(!userList.checkIfUserExist(email)){
+                cout<<1;
+                json::wvalue err;
+                err["message"]="the user not exist";
+                return crow::response(400,err);
+            }
+            string query="INSERT INTO loans (email,states,duration,loan_cost,date) VALUES('"+email+"',2,'"+duration+"','"+to_string(money)+"','"+currentDate()+"') ";
+            if(mysql_query(conn,query.c_str())==0){
+                long long id = mysql_insert_id(conn);
+                LoanQ.insert(id,email,2,duration,to_string(money),currentDate());
+                LoanSSL.insertAtL(id,email,2,duration,to_string(money),currentDate());
+                return crow::response(200,"ok");
+            }
+            else{
+                cout<<3;
+                json::wvalue err;
+                err["message"]=mysql_error(conn);
+                return crow::response(400,err);
+            }
+
+    });
+
+
+
+
+
+
+
+
 
 
 

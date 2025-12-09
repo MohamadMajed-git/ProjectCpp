@@ -34,11 +34,14 @@ class SLL{
     string* validateLogin(string email, string password);//linearr search for email and password
     void deleteNodeByEmail(string email);
     Node* getNodeByEmail(string email);
+    Node* getNodeByAccountNumber(string accountNumber);
+    bool sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,int amount);
     string generateToken();
     string generateRandomInteger(int length);
     void insertToken(string email);
     crow::json::wvalue getDataByEmail(string email);
     string createAccountNumber(string accountType);
+    bool checkIfUserExist(string email);
     bool isEmpty();
     void display();
 };

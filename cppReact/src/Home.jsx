@@ -39,7 +39,15 @@ export default function Home() {
 return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-10">
       <div className="max-w-5xl mx-auto space-y-8">
-
+        <button 
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+        onClick={() => navigate('/send-money')}>Send Money</button>
+        <button 
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+        onClick={() => navigate('/user-transaction')}>View Transactions</button>
+        <button 
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+        onClick={() => navigate('/loan-request')}>Request Loan</button>
         <header className="flex items-center gap-4 mb-8">
           <div className="p-3 bg-blue-600 rounded-xl shadow-sm">
             <LayoutDashboard className="w-8 h-8 text-white" />

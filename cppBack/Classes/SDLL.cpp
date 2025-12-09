@@ -58,7 +58,7 @@ string* SLL::validateLogin(string email, string password)
         if (cur->email == email && cur->password == password)
         {
             cur->token = generateToken();
-            string *lst=new string[14];
+            string *lst=new string[15];
             lst[0]=(string)cur->name1;
             lst[1]=(string)cur->name2;
             lst[2]=(string)cur->nationalID;
@@ -73,6 +73,7 @@ string* SLL::validateLogin(string email, string password)
             lst[11]=(string)cur->createAt;
             lst[12]=(string)cur->status;
             lst[13]=to_string(cur->balance);
+            lst[14]=(string)cur->accountNumber;
             return lst;
            
         }
@@ -183,5 +184,40 @@ crow::json::wvalue SLL::getDataByEmail(string email){
     return crow::json::wvalue({{"message","User not found"}});
 }
 
+SLL::Node* SLL::getNodeByAccountNumber(string accountNumber){
+    Node *cur = head;
+    while (cur != nullptr)
+    {
+        if (cur->accountNumber == accountNumber)
+        {
+            return cur;
+        }
+        cur = cur->next;
+    }
+    return nullptr;
+}
 
+bool SLL::sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,int amount){
+    Node* senderNode=getNodeByAccountNumber(SenderAccountNumber);
+    Node* receiverNode=getNodeByAccountNumber(ReceiverAccountNumber);
+    if(senderNode==nullptr || receiverNode==nullptr){
+        return false;
+    }
+    if(senderNode->balance<amount){
+        return false;
+    }
+    senderNode->balance-=amount;
+    receiverNode->balance+=amount;
+    return true;
+}
 
+bool SLL::checkIfUserExist(string email){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            return 1;
+        }
+        cur=cur->next;
+    }
+    return 0;
+}

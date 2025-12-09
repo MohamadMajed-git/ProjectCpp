@@ -21,7 +21,7 @@ export default function DefaultLayout() {
     <div className="p-4 border-b border-gray-300">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-bold">Admin Panel</h1>
+          <h1 className="text-xl font-bold">User Panel</h1>
         
         </div>
         <div>
