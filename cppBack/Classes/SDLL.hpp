@@ -42,6 +42,8 @@ class SLL{
     crow::json::wvalue getDataByEmail(string email);
     string createAccountNumber(string accountType);
     bool checkIfUserExist(string email);
+    bool checkPassword(string email, string password);
+    bool checkIfAdmin(string email);
     bool isEmpty();
     void display();
 };

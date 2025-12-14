@@ -16,12 +16,15 @@ class TransactionDLL{
     };
     TransactionNode *head;
     TransactionNode *tail;
+    int size;
     public:
     TransactionDLL(){
         head=nullptr;
         tail=nullptr;
+        size=0;
     }
     void insertTransaction(int id, string senderAccountNumber,string receiverAccountNumber,int amount,string date);
     crow::json::wvalue getUserTransactions(string accountNumber);
     crow::json::wvalue getAllTransactions();
+    crow::json::wvalue getTransactionById(int id);
 };

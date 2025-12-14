@@ -48,7 +48,12 @@ return (
         <button 
         className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
         onClick={() => navigate('/loan-request')}>Request Loan</button>
+        <button 
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+        onClick={() => navigate('/change-password')}>Change Password</button>
+
         <header className="flex items-center gap-4 mb-8">
+
           <div className="p-3 bg-blue-600 rounded-xl shadow-sm">
             <LayoutDashboard className="w-8 h-8 text-white" />
           </div>

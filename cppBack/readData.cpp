@@ -70,6 +70,20 @@ void readAllDataFromDatabase(){
     }
 
 
+    qstate=mysql_query(conn,"SELECT  email,`new-password` FROM `password-requests` WHERE status = 'pending' ORDER BY id DESC");
+    if(!qstate){
+        res=mysql_store_result(conn);
+        while((row=mysql_fetch_row(res))){
+            stackPassword.pushRequest(row[1],row[0]);
+        }
+        mysql_free_result(res);
+        cout<<"Password change requests loaded successfully!"<<endl;
+    }
+    else{
+        cout<<"Query stackPassword Execution Problem!"<<mysql_error(conn)<<endl;
+    }
+
+
 }
 
 void readAllLoansFromDatabase() {

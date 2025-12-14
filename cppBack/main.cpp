@@ -7,6 +7,7 @@
 #include "routes.hpp"
 #include "Classes/SDLL.hpp"
 #include "Classes/TransactionDLL.hpp"
+#include "Classes/StackPassword.hpp"
 #include "readData.hpp"
 #include "Classes/QActivateAccounts.hpp"
 #include "Classes/Branch.hpp" // AHMED
@@ -21,7 +22,7 @@ SLL userList;
 TransactionDLL transactionList;
 QActivateAccounts activateAccounts;
 MYSQL* conn;
-
+StackPassword stackPassword;
 //yossef
 LoanSLL LoanSSL;
 LoanQueue LoanQ;

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Calendar, DollarSign, Hash, User, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import axiosClient from "../axiosClient";
 
 export default function AAllTransaction() {
     const [usersTransactions,setUsersTransactions]=useState(null);
-    
+    const idSearchRef=useRef();
+    const [reload,setReload]=useState(false);
     useEffect(()=>{
         axiosClient.get("/all-transactions")
         .then(res=>{
@@ -12,15 +13,43 @@ export default function AAllTransaction() {
             setUsersTransactions(res.data.transactions);
         })
     },[]);
+    const handleSearch=()=>{
+        axiosClient.post("/search-transaction",{
+            "searchId":idSearchRef.current.value
+        }).then(res=>{
+            console.log(res);
+            res.data.transactions.message?setUsersTransactions([]):setUsersTransactions([res.data.transactions]);
+        })
+    }
+    const allTransaction=()=>{
+        setReload(!reload);
+    };
     return (
 <div className="space-y-4">
-    {usersTransactions && usersTransactions.length > 0 ? (
+    <div className="flex flex-col md:flex-row gap-2 md:gap-4">
+        <input
+            type="text"
+            ref={idSearchRef}
+            placeholder="Search transactions..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+        onClick={handleSearch}
+        >
+            Search
+        </button>
+        <button className="mt-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+        onClick={allTransaction}
+        >
+            All Transactions
+        </button>
+    </div>
+    {usersTransactions  && usersTransactions.length > 0 ? (
         usersTransactions.map((transaction, index) => (
             <div 
                 key={index} 
                 className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200"
             >
-                {/* الجزء العلوي: رقم المعاملة والتاريخ */}
                 <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
                     <div className="flex items-center text-gray-500 text-xs font-medium">
                         <Hash size={14} className="mr-1 text-gray-400" />
@@ -32,10 +61,8 @@ export default function AAllTransaction() {
                     </div>
                 </div>
 
-                {/* الجزء الأوسط: تفاصيل التحويل (من -> إلى) */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
                     
-                    {/* الطرف المرسل (Sender) */}
                     <div className="flex items-center gap-3 w-full md:w-1/3">
                         <div className="p-2 bg-red-50 text-red-500 rounded-full">
                             <ArrowUpRight size={20} />
@@ -49,12 +76,10 @@ export default function AAllTransaction() {
                         </div>
                     </div>
 
-                    {/* سهم الاتجاه في المنتصف */}
                     <div className="hidden md:flex text-gray-300">
                         <ArrowRight size={24} />
                     </div>
 
-                    {/* الطرف المستلم (Receiver) */}
                     <div className="flex items-center gap-3 w-full md:w-1/3 justify-end md:flex-row-reverse">
                         <div className="p-2 bg-green-50 text-green-500 rounded-full">
                             <ArrowDownLeft size={20} />
@@ -69,7 +94,6 @@ export default function AAllTransaction() {
                     </div>
                 </div>
 
-                {/* الجزء السفلي: المبلغ الإجمالي */}
                 <div className="flex justify-end items-center mt-2 pt-2 border-t border-gray-50">
                     <div className="flex items-center bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
                         <span className="text-xs text-blue-600 mr-2 uppercase font-bold tracking-wider">Amount</span>

@@ -3,6 +3,7 @@
 #include "Classes/SDLL.hpp"
 #include "Classes/QActivateAccounts.hpp"
 #include "Classes/TransactionDLL.hpp"
+#include "Classes/StackPassword.hpp"
 #include <mysql.h>
 //yossef
 #include "Classes/LSLL.hpp"
@@ -17,6 +18,7 @@ extern SLL userList;
 extern MYSQL* conn;
 extern QActivateAccounts activateAccounts;
 extern TransactionDLL transactionList;
+extern StackPassword stackPassword;
 //yossef 
 extern LoanSLL LoanSSL;
 extern LoanQueue LoanQ;

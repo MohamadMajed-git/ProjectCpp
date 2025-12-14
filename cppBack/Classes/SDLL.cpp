@@ -221,3 +221,40 @@ bool SLL::checkIfUserExist(string email){
     }
     return 0;
 }
+
+
+
+bool SLL::checkIfAdmin(string email){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            if(cur->nationalID=="123456789123"){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        cur=cur->next;
+    }
+    return false;
+}
+
+
+
+
+bool SLL::checkPassword(string email, string password){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            if(cur->password==password){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        cur=cur->next;
+    }
+    return false;
+}

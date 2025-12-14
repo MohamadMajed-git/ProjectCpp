@@ -316,6 +316,138 @@ void setupRoutes(crow::SimpleApp &app)
 
 
 
+    CROW_ROUTE(app,"/api/search-transaction")
+    .methods("POST"_method,"OPTIONS"_method)
+    ([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+
+        json::rvalue data=json::load(req.body);
+        if(!data)return response(400,"Invalid JSON");
+
+        int searchId=data.has("searchId")?(int)data["searchId"].i():0;
+        json::wvalue response;
+        response["transactions"]=transactionList.getTransactionById(searchId);
+        return crow::response(200,response);
+    });
+
+
+
+    CROW_ROUTE(app,"/api/change-password")
+    .methods("POST"_method,"OPTIONS"_method)
+    ([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+
+        json::rvalue data=json::load(req.body);
+        if(!data)return response(400,"Invalid JSON");
+
+        string email=data.has("email")?(string)data["email"].s():(string)"";
+        string oldPassword=data.has("oldPassword")?(string)data["oldPassword"].s():(string)"";
+        string newPassword=data.has("newPassword")?(string)data["newPassword"].s():(string)"";
+        bool checkOldPassword = userList.checkPassword(email, oldPassword);
+        if(checkOldPassword==false){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "Old password is incorrect";
+            return crow::response(400, response);
+        }
+        string query="INSERT INTO `password-requests` (`email`, `new-password`) VALUES('"+email+"','"+newPassword+"')";
+        if(mysql_query(conn,query.c_str())==0){
+                bool found = userList.checkIfUserExist(email);
+
+            if (!found ) {
+                json::wvalue response;
+                response["status"] = "error";
+                response["message"] = "User not found";
+                return crow::response(404, response);
+            }
+            stackPassword.pushRequest(newPassword, email);
+
+    }
+        else{
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        
+        json::wvalue response;
+        response["status"] = "success";
+        return crow::response(200, response);
+    });
+
+
+    CROW_ROUTE(app,"/api/password-change-requests")
+    .methods("POST"_method,"OPTIONS"_method)
+    ([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+        json::rvalue data=json::load(req.body);
+        if(!data)return response(400,"Invalid JSON");
+        string email=data.has("email")?(string)data["email"].s():(string)"";
+        bool isAdmin = userList.checkIfAdmin(email);
+        if(isAdmin==false){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "Unauthorized";
+            return crow::response(401, response);
+        }
+        json::wvalue response;
+        response["requests"] = stackPassword.getAllData();
+        return crow::response(200, response);
+    });
+
+    CROW_ROUTE(app,"/api/approve-password-change")
+    .methods("POST"_method,"OPTIONS"_method)
+    ([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+        json::rvalue data=json::load(req.body);
+        if(!data)return response(400,"Invalid JSON");
+        string email=data.has("email")?(string)data["email"].s():(string)"";
+        string newPassword=data.has("newPassword")?(string)data["newPassword"].s():(string)"";
+        string userEmail=data.has("userEmail")?(string)data["userEmail"].s():(string)"";
+        bool isAdmin = userList.checkIfAdmin(email);
+        if(isAdmin==false){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "Unauthorized";
+            return crow::response(401, response);
+        }
+        if(stackPassword.isEmpty()){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "No password change requests";
+            return crow::response(400, response);
+        }
+            string query = "UPDATE users SET password = '" + newPassword + "' WHERE email = '" + userEmail + "'";
+            if(mysql_query(conn, query.c_str()) != 0)
+            {
+                string errorMsg = mysql_error(conn);
+                cout << "MySQL Query Error: " << errorMsg << endl;
+                crow::json::wvalue response;
+                response["status"] = "error";
+                response["message"] = "somthing went wrong" + errorMsg;
+                return crow::response(400, response);
+            }
+            query = "UPDATE `password-requests` SET status = 'approved' WHERE email = '" + userEmail + "' AND status = 'pending'";
+            if(mysql_query(conn, query.c_str()) != 0)
+            {
+                string errorMsg = mysql_error(conn);
+                cout << "MySQL Query Error: " << errorMsg << endl;
+                crow::json::wvalue response;
+                response["status"] = "error";
+                response["message"] = "somthing went wrong" + errorMsg;
+                return crow::response(400, response);
+            }
+        stackPassword.popRequest();
+        json::wvalue response;
+        response["status"] = "success";
+        return crow::response(200, response);
+        
+    });
+
+
+
 
 
 
