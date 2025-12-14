@@ -16,6 +16,10 @@ export default function AHome() {
       <button className="bg-blue-500 rounded p-2 hover:bg-blue-400 ml-4"
       onClick={()=>navigate("/admin/all-transactions")}
       >All Transactions</button>
+      <button className="bg-blue-500 rounded p-2 hover:bg-blue-400 ml-4"
+      onClick={()=>navigate("/admin/branches")}
+      >Branches</button>
     </div>
+    
   );
 }

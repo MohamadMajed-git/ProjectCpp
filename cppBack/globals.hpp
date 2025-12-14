@@ -7,6 +7,10 @@
 //yossef
 #include "Classes/LSLL.hpp"
 #include "Classes/LQue.hpp"
+
+//AHMED
+#include "Classes/Branch.hpp"
+
 using namespace std;
 //mohammad
 extern SLL userList; 
@@ -17,3 +21,8 @@ extern TransactionDLL transactionList;
 extern LoanSLL LoanSSL;
 extern LoanQueue LoanQ;
 string currentDate();
+
+
+
+//AHMED
+extern BranchList branchList;

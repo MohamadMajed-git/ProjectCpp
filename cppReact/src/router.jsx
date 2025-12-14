@@ -75,7 +75,12 @@ const router = createBrowserRouter([
             {
                 path: "all-transactions",
                 element: <AAllTransaction />
+            },
+            {
+                path:"handle-loan-request",
+                element:<Handle-loan />
             }
+
         ]
     },
     {

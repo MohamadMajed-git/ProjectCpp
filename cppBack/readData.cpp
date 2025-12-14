@@ -102,3 +102,36 @@ void readAllLoansFromDatabase() {
         cout << "Loan Execution Problem! " << mysql_error(conn) << endl;
     }
 }
+
+
+
+
+
+
+
+void readAllBranchesFromDatabase() {
+    MYSQL_ROW row;
+    MYSQL_RES* res;
+
+    int qstate = mysql_query(conn, "SELECT id, branch_name, location_link, phone, address FROM branches");
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        while ((row = mysql_fetch_row(res))) {
+            int id = row[0] ? stoi(row[0]) : 0;
+            string name = row[1] ? row[1] : "";
+            string loc = row[2] ? row[2] : "";
+            string phone = row[3] ? row[3] : "";
+            string addr = row[4] ? row[4] : "";
+
+            Branch* newBranch = new Branch(id, name, loc, phone, addr);
+            branchList.insert(newBranch);
+        }
+        mysql_free_result(res);
+        cout << "Branches loaded successfully!" << endl;
+
+
+       
+    } else {
+        cout << "Query Execution Problem! " << mysql_error(conn) << endl;
+    }
+}
