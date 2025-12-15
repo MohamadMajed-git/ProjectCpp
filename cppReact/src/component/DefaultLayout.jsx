@@ -1,6 +1,8 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
 import { useEffect } from "react";
+import BankLogo from '../assets/BankLogo.png';
+
 
 export default function DefaultLayout() {
   const navigate=useNavigate();
@@ -18,8 +20,11 @@ export default function DefaultLayout() {
 
   return (
     <>
-    <div className="p-4 border-b border-gray-300">
+    <div className="px-4 border-b border-gray-300">
       <header className="flex justify-between items-center">
+        <div>
+          <img src={BankLogo} alt="Bank Logo" className="h-20 w-30"/>
+        </div>
         <div>
           <h1 className="text-xl font-bold">User Panel</h1>
         

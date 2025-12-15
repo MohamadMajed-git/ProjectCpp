@@ -16,6 +16,7 @@ import AAllTransaction from "./AdminPages/AAllTransaction";
 import Loan from "./pages/Loan";
 import ChangePassword from "./pages/ChangePassword";
 import PasswordChangeRequests from "./AdminPages/PasswordChangeRequests";
+import HandleLoans from "./AdminPages/HandleLoan";
 
 const router = createBrowserRouter([
 
@@ -57,8 +58,8 @@ const router = createBrowserRouter([
                 element: <Loan />
             },
             {
-                path:"change-password",
-                element:<ChangePassword />
+                path: "change-password",
+                element: <ChangePassword />
             }
         ]
     },
@@ -83,12 +84,12 @@ const router = createBrowserRouter([
                 element: <AAllTransaction />
             },
             {
-                path:"handle-loan-request",
-                element:<Handle-loan />
+                path: "password-change-requests",
+                element: <PasswordChangeRequests />
             },
             {
-                path:"password-change-requests",
-                element:<PasswordChangeRequests />
+                path: "handle-loan-request",
+                element: <HandleLoans />
             }
 
         ]

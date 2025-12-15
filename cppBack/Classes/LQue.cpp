@@ -1,6 +1,8 @@
 #include "LQue.hpp"
 #include "../globals.hpp"
 #include <iostream>
+#include <crow.h>
+#include <vector>
 #include <string>
 #include <random>
 
@@ -32,22 +34,43 @@ bool LoanQueue::isEmpty() {
     return head == nullptr;
 }
 
-LoanQueue::LoanNode* LoanQueue::getNodeByEmail(string email) {
+crow::json::wvalue LoanQueue::getNodeByid(int id) {
+    vector<crow::json::wvalue> accountbyid;
     LoanNode* temp = head;
     while (temp != nullptr) {
-        if (temp->email == email) return temp;
+        if (temp->id == id) {
+        crow::json::wvalue account;
+            account["id"] = temp->id;
+            account["email"] = temp->email;
+            account["states"] = temp->states;
+            account["duration"] = temp->duration;
+            account["loan_cost"] = temp->loan_cost;
+            account["date"] = temp->date;
+            return account;
+        }
         temp = temp->next;
     }
     return nullptr;
 }
 
-void LoanQueue::deleteNodeByEmail(string email) {
+void LoanQueue::changestates(int id, int newState) {
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->id == id) {
+            temp->states = newState;
+            return;
+        }
+        temp = temp->next;
+    }
+}
+
+void LoanQueue::deleteNodeById(int id) {
     if (isEmpty()) return;
 
     LoanNode* temp = head;
     LoanNode* prev = nullptr;
 
-    if (head->email == email) {
+    if (head->id == id) {
         head = head->next;
         delete temp;
         len--;
@@ -56,7 +79,7 @@ void LoanQueue::deleteNodeByEmail(string email) {
     }
 
 
-    while (temp != nullptr && temp->email != email) {
+    while (temp != nullptr && temp->id != id) {
         prev = temp;
         temp = temp->next;
     }
@@ -107,4 +130,39 @@ void LoanQueue::remove() {
     len--;
 
     temp->next = nullptr;
+}
+
+
+vector<std::string> LoanQueue::getEmailAndMoney(int id) {
+    LoanNode* cur = head;
+
+    while (cur != nullptr) {
+        if (cur->id == id) {
+            return {cur->email, cur->loan_cost};
+        }
+        cur = cur->next;
+    }
+
+    return {"", ""};
+}
+
+
+crow::json::wvalue LoanQueue::getAllLoansJSON() {
+    vector<crow::json::wvalue> loansList;
+
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        crow::json::wvalue loan;
+        loan["id"] = temp->id;
+        loan["email"] = temp->email;
+        loan["states"] = temp->states;
+        loan["duration"] = temp->duration;
+        loan["loan_cost"] = temp->loan_cost;
+        loan["date"] = temp->date;
+
+        loansList.push_back(std::move(loan));
+        temp = temp->next;
+    }
+
+    return crow::json::wvalue(loansList);
 }

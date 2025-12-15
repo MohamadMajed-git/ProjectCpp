@@ -40,6 +40,7 @@ int main()
     readAllBranchesFromDatabase();
     crow::SimpleApp app; 
     setupRoutes(app);
+    setupLoanRoutes(app);
     setupBranchRoutes(app);
 
 

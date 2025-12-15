@@ -439,6 +439,7 @@ void setupRoutes(crow::SimpleApp &app)
                 response["message"] = "somthing went wrong" + errorMsg;
                 return crow::response(400, response);
             }
+        userList.updatePassword(userEmail, newPassword);
         stackPassword.popRequest();
         json::wvalue response;
         response["status"] = "success";
@@ -446,6 +447,42 @@ void setupRoutes(crow::SimpleApp &app)
         
     });
 
+    CROW_ROUTE(app,"/api/deny-password-change")
+    .methods("POST"_method,"OPTIONS"_method)([](const request &req){
+        if (req.method == "OPTIONS"_method) return crow::response(200);
+        json::rvalue data=json::load(req.body);
+        if(!data)return response(400,"Invalid JSON");
+        string email=data.has("email")?(string)data["email"].s():(string)"";
+        string newPassword=data.has("newPassword")?(string)data["newPassword"].s():(string)"";
+        string userEmail=data.has("userEmail")?(string)data["userEmail"].s():(string)"";
+        bool isAdmin = userList.checkIfAdmin(email);
+        if(isAdmin==false){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "Unauthorized";
+            return crow::response(401, response);
+        }
+        if(stackPassword.isEmpty()){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "No password change requests";
+            return crow::response(400, response);
+        }
+        string query = "UPDATE `password-requests` SET status = 'denied' WHERE email = '" + userEmail + "' AND status = 'pending' ORDER BY id DESC LIMIT 1";
+            if(mysql_query(conn, query.c_str()) != 0)
+            {
+                string errorMsg = mysql_error(conn);
+                cout << "MySQL Query Error: " << errorMsg << endl;
+                crow::json::wvalue response;
+                response["status"] = "error";
+                response["message"] = "somthing went wrong" + errorMsg;
+                return crow::response(400, response);
+            }
+        stackPassword.popRequest();
+        json::wvalue response;
+        response["status"] = "success";
+        return crow::response(200, response);
+        });
 
 
 
@@ -453,10 +490,28 @@ void setupRoutes(crow::SimpleApp &app)
 
 
 
+        
+        
+        
+        
+        
 
+        
+        
+        
+        
+        
+
+        
+        
+    }
+    
 //! yoooooooooooooooosssssssssseeeeeffff
 
-    CROW_ROUTE(app,"/api/submit-loan-request")
+
+
+void setupLoanRoutes(crow::SimpleApp &app) {
+        CROW_ROUTE(app,"/api/submit-loan-request")
     .methods("POST"_method,"OPTIONS"_method)([](const request &req){
                 if (req.method == "OPTIONS"_method) return crow::response(200);
                 json::rvalue data=json::load(req.body);
@@ -478,7 +533,6 @@ void setupRoutes(crow::SimpleApp &app)
                 return crow::response(200,"ok");
             }
             else{
-                cout<<3;
                 json::wvalue err;
                 err["message"]=mysql_error(conn);
                 return crow::response(400,err);
@@ -488,20 +542,91 @@ void setupRoutes(crow::SimpleApp &app)
 
 
 
+    CROW_ROUTE(app, "/api/admin/get-all-loans")
+.methods("GET"_method)
+([]() {
+    return crow::response(200, LoanQ.getAllLoansJSON());
+});
+
+
+CROW_ROUTE(app, "/api/admin/approve-loan")
+.methods("POST"_method, "OPTIONS"_method)
+([](const crow::request& req) {
+    if (req.method == "OPTIONS"_method) return crow::response(200);
+
+    auto data = crow::json::load(req.body);
+    if (!data) return crow::response(400, "Invalid JSON");
+
+    int id = data["id"].i();
+    std::vector<std::string> data1 = LoanQ.getEmailAndMoney(id);
+    std::string email = data1[0];
+    std::string money = data1[1];
+
+    int moneyInt = stoi(money);
+    string query = "UPDATE loans SET states = 1 WHERE id = " + to_string(id);
+    string query2 = "UPDATE users SET balance = balance + " + to_string(moneyInt) +" WHERE email = '" + email + "'";
+
+    if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){   
+
+    LoanQ.changestates(id, 1); // approveds
+    LoanSSL.changestates(id, 1); // approveds
+    LoanQ.remove();
+
+        return crow::response(200, "State updated");
+        }
+        else{
+                json::wvalue err;
+                err["message"]=mysql_error(conn);
+                return crow::response(400,err);
+            }
+
+
+    return crow::response(200, "approved");
+});
+
+
+//////////////////////////////////
+CROW_ROUTE(app, "/api/admin/deny-loan")
+.methods("POST"_method, "OPTIONS"_method)
+([](const crow::request& req) {
+    if (req.method == "OPTIONS"_method) return crow::response(200);
+
+    auto data = crow::json::load(req.body);
+    if (!data) return crow::response(400, "Invalid JSON");
+
+    int id = data["id"].i();
+    string query = "UPDATE loans SET states = 3 WHERE id = " + to_string(id);
+    if(mysql_query(conn,query.c_str())==0){   
+
+    LoanQ.changestates(id, 3); // deny
+    LoanSSL.changestates(id, 3); // deny
+    LoanQ.remove();
+        return crow::response(200, "State updated");
+
+        }
+
+
+    return crow::response(200, "denied");
+});
 
 
 
 
+CROW_ROUTE(app, "/api/admin/get-all-loans-history")
+.methods("GET"_method)
+([]() {
+    return crow::response(200, LoanSSL.getAllLoansJSON());
+});
 
-
-
-
+CROW_ROUTE(app, "/api/client/get-loans-history")
+.methods("GET"_method)
+([](const crow::request& req) {
+    auto email = req.url_params.get("email");
+    return crow::response(200, LoanSSL.getLoansByEmailJSON(email));
+});
 
 
 }
-
-
-
 
 
 

@@ -12,7 +12,7 @@ export default function AAllTransaction() {
             console.log(res);
             setUsersTransactions(res.data.transactions);
         })
-    },[]);
+    },[reload]);
     const handleSearch=()=>{
         axiosClient.post("/search-transaction",{
             "searchId":idSearchRef.current.value

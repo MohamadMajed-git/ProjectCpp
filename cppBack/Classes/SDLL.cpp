@@ -242,6 +242,18 @@ bool SLL::checkIfAdmin(string email){
 
 
 
+void SLL::updatePassword(string email, string newPassword){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            cur->password=newPassword;
+            return;
+        }
+        cur=cur->next;
+    }
+}
+
+
 
 bool SLL::checkPassword(string email, string password){
     Node* cur=head;

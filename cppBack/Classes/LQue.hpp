@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include<crow.h>
+#include <vector>
 #include <string>
 using namespace std;
 
@@ -14,8 +16,8 @@ class LoanQueue {
     string date;
     LoanNode* next=nullptr;
     };
-    public:
 
+    public:
     LoanNode* head;
     LoanNode* tail;
     int len;
@@ -26,8 +28,11 @@ class LoanQueue {
     }
 
     string insert(int id, string email, int states, string duration, string loan_cost, string date);
-    LoanNode* getNodeByEmail(string email);
-    void deleteNodeByEmail(string email);
+    void changestates(int id, int newState);
+    crow::json::wvalue getNodeByid(int id);
+    vector<std::string> getEmailAndMoney(int id);
+    crow::json::wvalue getAllLoansJSON();
+    void deleteNodeById(int id);
     void remove();
     bool isEmpty();
     void display();

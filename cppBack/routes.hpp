@@ -2,4 +2,4 @@
 #include <crow.h>
 void setupRoutes(crow::SimpleApp& app);
 void setupBranchRoutes(crow::SimpleApp &app);
-
+void setupLoanRoutes(crow::SimpleApp &app);

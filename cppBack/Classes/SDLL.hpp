@@ -44,6 +44,7 @@ class SLL{
     bool checkIfUserExist(string email);
     bool checkPassword(string email, string password);
     bool checkIfAdmin(string email);
+    void updatePassword(string email, string newPassword);
     bool isEmpty();
     void display();
 };

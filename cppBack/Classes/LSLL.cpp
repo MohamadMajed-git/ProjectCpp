@@ -2,6 +2,8 @@
 #include "../globals.hpp"
 #include <iostream>
 #include <string>
+#include <crow.h>
+#include <vector>
 #include <random>
 
 using namespace std;
@@ -96,4 +98,56 @@ void LoanSLL::display() {
              << " | " << cur->date << endl;
         cur = cur->next;
     }
+}
+void LoanSLL::changestates(int id, int newState) {
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->id == id) {
+            temp->states = newState;
+            return;
+        }
+        temp = temp->next;
+    }
+}
+
+crow::json::wvalue LoanSLL::getAllLoansJSON() {
+    vector<crow::json::wvalue> loansList;
+
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        crow::json::wvalue loan;
+        loan["id"] = temp->id;
+        loan["email"] = temp->email;
+        loan["states"] = temp->states;
+        loan["duration"] = temp->duration;
+        loan["loan_cost"] = temp->loan_cost;
+        loan["date"] = temp->date;
+
+        loansList.push_back(std::move(loan));
+        temp = temp->next;
+    }
+
+    return crow::json::wvalue(loansList);
+}
+
+crow::json::wvalue LoanSLL::getLoansByEmailJSON(string email) {
+    vector<crow::json::wvalue> loansList;
+
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->email == email) {
+            crow::json::wvalue loan;
+            loan["id"] = temp->id;
+            loan["email"] = temp->email;
+            loan["states"] = temp->states;
+            loan["duration"] = temp->duration;
+            loan["loan_cost"] = temp->loan_cost;
+            loan["date"] = temp->date;
+
+            loansList.push_back(std::move(loan));
+        }
+        temp = temp->next;
+    }
+
+    return crow::json::wvalue(loansList);
 }
