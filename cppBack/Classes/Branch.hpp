@@ -1,31 +1,33 @@
 #pragma once
 #include <string>
+#include <iostream>
+#include <crow.h>
 using namespace std;
 
-struct Branch {
-    int id; // from DB
-    string branch_name;
-   string location_link;
-   string phone;
-    string address;
 
-    Branch* next;
-
-    Branch(int _id, string _name, string _loc, string _phone, string _addr)
-        : id(_id), branch_name(_name), location_link(_loc),
-          phone(_phone), address(_addr), next(nullptr) {}
-};
 
 class BranchList {
+    struct Branch{
+    int id; // from DB
+    string branch_name;
+    string location_link;
+    string phone;
+    string address;
+    Branch* right=nullptr;
+    Branch* left=nullptr;
+    };
 private:
-    Branch* head;
+    Branch* root;
 
 public:
-    BranchList();
-    ~BranchList();
+    BranchList(){
+        root = nullptr;
+    };
+    
    
-    void insert(Branch* node);
-    Branch* findById(int id);
+    void insert(int id, string name, string loc, string phone, string addr);
+    crow::json::wvalue findById(int id);
     bool removeById(int id);
-    Branch* getAll(); // return head pointer
+    void makeVectorList(Branch* root, vector<crow::json::wvalue>& branches);
+    crow::json::wvalue getAll(); 
 };

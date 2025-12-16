@@ -645,145 +645,98 @@ CROW_ROUTE(app, "/api/client/get-loans-history")
 
 void setupBranchRoutes(crow::SimpleApp &app) {
 
-    CROW_ROUTE(app, "/api/branches").methods("GET"_method)
-    ([&](const crow::request &req){
-        auto query_dict = crow::query_string(req.url);
-        string search = query_dict.get("search") ? query_dict.get("search") : "";
+    // CROW_ROUTE(app, "/api/branches").methods("GET"_method)
+    // ([&](const crow::request &req){
+    //     auto query_dict = crow::query_string(req.url);
+    //     string search = query_dict.get("search") ? query_dict.get("search") : "";
 
-        crow::json::wvalue result;
-        int index = 0;
-        Branch* cur = branchList.getAll();
+    //     crow::json::wvalue result;
+    //     int index = 0;
+        
 
-        while(cur) {
-            bool include = true;
-            if(!search.empty()) {
-                stringstream ss;
-                ss << cur->id;
-                string id_str = ss.str();
-                if(cur->branch_name.find(search) == string::npos && id_str.find(search) == string::npos) {
-                    include = false;
-                }
-            }
-            if(include) {
-                result[index]["id"] = cur->id;
-                result[index]["branch_name"] = cur->branch_name;
-                result[index]["location_link"] = cur->location_link;
-                result[index]["phone"] = cur->phone;
-                result[index]["address"] = cur->address;
-                index++;
-            }
-            cur = cur->next;
-        }
-
-        return crow::response(result);
-    });
+    //     return crow::response(200, branchList.getAll());
+    // });
 
     // GET فرع بالـ ID
-    CROW_ROUTE(app, "/branches/<int>").methods("GET"_method)
-    ([&](int id){
-        Branch* branch = branchList.findById(id);
-        if(branch) {
-            crow::json::wvalue result;
-            result["id"] = branch->id;
-            result["branch_name"] = branch->branch_name;
-            result["location_link"] = branch->location_link;
-            result["phone"] = branch->phone;
-            result["address"] = branch->address;
-            return crow::response(result);
-        } else {
-            crow::json::wvalue res;
-            res["error"] = "Branch not found";
-            return crow::response(404, res);
-        }
+    CROW_ROUTE(app, "/api/branches").methods("GET"_method)
+    ([](){
+        return crow::response(200,branchList.getAll());
     });
 
     // POST لإضافة فرع جديد
-    CROW_ROUTE(app, "/api/branches").methods("POST"_method)
-    ([&](const crow::request &req){
-        auto body = crow::json::load(req.body);
-        if(!body) {
-            crow::json::wvalue resErr;
-            resErr["error"] = "Invalid JSON";
-            return crow::response(400, resErr);
-        }
+    // CROW_ROUTE(app, "/api/branches").methods("POST"_method)
+    // ([&](const crow::request &req){
+    //     auto body = crow::json::load(req.body);
+    //     if(!body) {
+    //         crow::json::wvalue resErr;
+    //         resErr["error"] = "Invalid JSON";
+    //         return crow::response(400, resErr);
+    //     }
 
-        string name = body["branch_name"].s();
-        string loc = body["location_link"].s();
-        string phone = body["phone"].s();
-        string addr = body["address"].s();
+    //     string name = body["branch_name"].s();
+    //     string loc = body["location_link"].s();
+    //     string phone = body["phone"].s();
+    //     string addr = body["address"].s();
 
-        static int tempId = 1000;
-        Branch* newBranch = new Branch(tempId++, name, loc, phone, addr);
-        branchList.insert(newBranch);
+    //     static int tempId = 1000;
+    //     branchList.insert(tempId++, name, loc, phone, addr);
 
-        crow::json::wvalue res;
-        res["message"] = "Branch added successfully";
-        res["branch"]["id"] = newBranch->id;
-        res["branch"]["branch_name"] = newBranch->branch_name;
-        return crow::response(res);
-    });
+    //     crow::json::wvalue res;
+    //     res["message"] = "Branch added successfully";
+    //     return crow::response(res);
+    // });
 
     // DELETE فرع
-    CROW_ROUTE(app, "/branches/<int>").methods("DELETE"_method)
-    ([&](int id){
-        bool removed = branchList.removeById(id);
-        crow::json::wvalue res;
-        if(removed) {
-            res["message"] = "Branch deleted successfully";
-            return crow::response(res);
-        } else {
-            res["error"] = "Branch not found";
-            return crow::response(404, res);
-        }
-    });
+    // CROW_ROUTE(app, "/branches/<int>").methods("DELETE"_method)
+    // ([&](int id){
+    //     bool removed = branchList.removeById(id);
+    //     crow::json::wvalue res;
+    //     if(removed) {
+    //         res["message"] = "Branch deleted successfully";
+    //         return crow::response(res);
+    //     } else {
+    //         res["error"] = "Branch not found";
+    //         return crow::response(404, res);
+    //     }
+    // });
 
     // PUT لتعديل فرع
-    CROW_ROUTE(app, "/branches/<int>").methods("PUT"_method)
-    ([&](const crow::request &req, int id){
-        Branch* branch = branchList.findById(id);
-        if(!branch) {
-            crow::json::wvalue resErr;
-            resErr["error"] = "Branch not found";
-            return crow::response(404, resErr);
-        }
+    // CROW_ROUTE(app, "/branches/<int>").methods("PUT"_method)
+    // ([&](const crow::request &req, int id){
+        
+    //     if(!branch1) {
+    //         crow::json::wvalue resErr;
+    //         resErr["error"] = "Branch not found";
+    //         return crow::response(404, resErr);
+    //     }
 
-        auto body = crow::json::load(req.body);
-        if(!body) {
-            crow::json::wvalue resErr;
-            resErr["error"] = "Invalid JSON";
-            return crow::response(400, resErr);
-        }
+    //     auto body = crow::json::load(req.body);
+    //     if(!body) {
+    //         crow::json::wvalue resErr;
+    //         resErr["error"] = "Invalid JSON";
+    //         return crow::response(400, resErr);
+    //     }
 
-        if(body.has("branch_name")) branch->branch_name = body["branch_name"].s();
-        if(body.has("location_link")) branch->location_link = body["location_link"].s();
-        if(body.has("phone")) branch->phone = body["phone"].s();
-        if(body.has("address")) branch->address = body["address"].s();
+    //     if(body.has("branch_name")) branch1->branch_name = body["branch_name"].s();
+    //     if(body.has("location_link")) branch1->location_link = body["location_link"].s();
+    //     if(body.has("phone")) branch1->phone = body["phone"].s();
+    //     if(body.has("address")) branch1->address = body["address"].s();
 
-        crow::json::wvalue res;
-        res["message"] = "Branch updated successfully";
-        res["branch"]["id"] = branch->id;
-        res["branch"]["branch_name"] = branch->branch_name;
-        return crow::response(res);
-    });
+    //     crow::json::wvalue res;
+    //     res["message"] = "Branch updated successfully";
+    //     res["branch"]["id"] = branch1->id;
+    //     res["branch"]["branch_name"] = branch1->branch_name;
+    //     return crow::response(res);
+    // });
 
 
      // GET كل الفروع للمستخدم
     CROW_ROUTE(app, "/user/branches").methods("GET"_method)
     ([&](){
         crow::json::wvalue result;
-        int index = 0;
-        Branch* cur = branchList.getAll();
+        result = branchList.getAll();
 
-        while(cur) {
-            result[index]["branch_name"] = cur->branch_name;       // اسم البنك
-            result[index]["area"] = cur->address;                 // اسم المنطقة
-            result[index]["phone"] = cur->phone;                 // رقم التليفون
-            result[index]["location_link"] = cur->location_link; // لينك اللوكيشن
-            index++;
-            cur = cur->next;
-        }
-
-        return crow::response(result);
+        return crow::response(200,result);
     });
 
 

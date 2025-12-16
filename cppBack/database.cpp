@@ -18,7 +18,7 @@ void connectToDatabase(){
     // unsigned int port=25739;
     const char* hostsname="mysql-cpp-project-momolovmomolov12343211-1949.e.aivencloud.com";
     const char* user="avnadmin";
-    const char* pass="";
+    const char* pass="AVNS_RD-EPPWN0iYoIAnuPzE";
     const char* dbname="bank-system";
     unsigned int port=25739;
     if(mysql_real_connect(conn,hostsname,user,pass,dbname,port,NULL,0)){

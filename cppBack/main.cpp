@@ -46,7 +46,7 @@ int main()
 
 
 
-    cout << ">> [START] Server listening on port 10000..." << endl;
+    cout << "We are on port 10000..." << endl;
     
     app.bindaddr("0.0.0.0").port(10000).multithreaded().run();
     mysql_close(conn);

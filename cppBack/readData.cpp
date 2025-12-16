@@ -110,7 +110,7 @@ void readAllLoansFromDatabase() {
             }
         }
         mysql_free_result(res);
-        LoanSSL.display(); 
+        cout << "Loans loaded successfully!" << endl;
     }
     else {
         cout << "Loan Execution Problem! " << mysql_error(conn) << endl;
@@ -136,9 +136,7 @@ void readAllBranchesFromDatabase() {
             string loc = row[2] ? row[2] : "";
             string phone = row[3] ? row[3] : "";
             string addr = row[4] ? row[4] : "";
-
-            Branch* newBranch = new Branch(id, name, loc, phone, addr);
-            branchList.insert(newBranch);
+            branchList.insert(id, name, loc, phone, addr);
         }
         mysql_free_result(res);
         cout << "Branches loaded successfully!" << endl;
