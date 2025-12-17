@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { User, Mail, Calendar, Check, Trash2, Clock } from 'lucide-react';
+import Swal from "sweetalert2";
 
 export default function HoldedAccounts() {
   const [data,setData]=useState();
@@ -22,17 +23,49 @@ export default function HoldedAccounts() {
     axiosClient.post("/holded-accounts/activate")
     .then(response=>
     {
+      Swal.fire({
+        icon: 'success',
+        title: 'Accounts Activated Successfully',
+        showConfirmButton: false,
+        timer: 1500
+      })
       setReload(!reload);
       console.log(response);
     })
+    .catch(error=>
+      {
+        console.log(error);
+        const errormessage = error.response.data.message|| error.message || "Something went wrong";
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errormessage,
+        })
+      }
+    );
   }
 
   const handleDelete=()=>{
     axiosClient.post("/holded-accounts/delete")
     .then(response=>
     {
+      Swal.fire({
+        icon: 'success',
+        title: 'Accounts Deleted Successfully',
+        showConfirmButton: false,
+        timer: 1500
+      })
       setReload(!reload);
       console.log(response);
+    })
+    .catch(error=>{
+      console.log(error);
+      const errormessage = error.response.data.message|| error.message || "Something went wrong";
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errormessage,
+      })
     })
   }
 

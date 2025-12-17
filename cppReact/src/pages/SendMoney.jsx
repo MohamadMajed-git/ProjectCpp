@@ -1,9 +1,9 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../context/ContextProvider";
 import { Send, Hash, DollarSign, ArrowLeft, Banknote } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-
+import Swal from 'sweetalert2'
 export default function SendMoney() {
     const navigate=useNavigate();
     const moneyRef=useRef(null);
@@ -17,7 +17,20 @@ export default function SendMoney() {
             "receiverAccountNumber":accountNumber,
             "senderAccountNumber":user.accountNumber
         }).then(res=>{
-            alert("Money Sent Successfully");
+            Swal.fire({
+                icon: 'success',
+                title: 'Money sent successfully',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        }).catch(err=>{
+            console.log(err);
+            const errormessage = err.response.data.message|| err.message || "Something went wrong";
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errormessage,
+            })
         })
     };
     

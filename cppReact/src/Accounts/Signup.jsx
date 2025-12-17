@@ -8,6 +8,7 @@ import {
 import axiosClient from "../axiosClient";
 import { useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
+import Swal from "sweetalert2";
 
 export default function Signup() {
   const [progress, setProgress] = useState(30);
@@ -52,9 +53,24 @@ export default function Signup() {
     axiosClient.post('/signup', userData)
     .then(response => {
         console.log("Signup Successful:", response.data);
+        Swal.fire({
+            icon: 'success',
+            title: 'Signup Successful',
+            showConfirmButton: false,
+            timer: 1500
+        });
+
+    }).then(() => {
+        navigate('/login');
     })
     .catch(error => {
         console.error("Signup Error:", error);
+        const errormessage = error.response.data.message|| error.message || "Something went wrong";
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errormessage,
+        })
     });
     console.log("User Data Collected:", userData);
 

@@ -2,6 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
 import { useEffect } from "react";
 import BankLogo from '../assets/BankLogo.png';
+import { ShieldCheck } from "lucide-react";
 
 export default function ADefaultLayout() {
     const navigate=useNavigate();
@@ -22,11 +23,13 @@ export default function ADefaultLayout() {
   
     return (
     <>
-    <div className="px-4 border-b border-gray-300">
+    <div className="p-4 border-b border-gray-300">
       <header className="flex justify-between items-center">
-        <div>
-          <img src={BankLogo} alt="Bank Logo" className="h-20 w-30"/>
-        
+        <div className="flex items-center gap-2">
+          <div className="bg-blue-600 p-2 rounded-lg">
+            <ShieldCheck className="text-white" size={24} />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-slate-800">TRUST<span className="text-blue-600">BANK</span></span>
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
@@ -40,7 +43,7 @@ export default function ADefaultLayout() {
       </header>
 
     </div>
-    <main className="p-4">
+    <main className="p-4 bg-[#f8fafc]">
         <Outlet/>
     </main>
     </>

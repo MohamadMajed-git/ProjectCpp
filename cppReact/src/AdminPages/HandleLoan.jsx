@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { CheckCircle, XCircle, Clock, History, FileText, AlertCircle } from 'lucide-react';
+import Swal from "sweetalert2";
 export default function HandleLoans() {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,23 +37,53 @@ export default function HandleLoans() {
   const fetchHistory = () => {
     setLoading(true);
     axiosClient.get("admin/get-all-loans-history")
-      .then((res) => setHistory(res.data || []))
-      .finally(() => setLoading(false));
+      .then((res) => {setHistory(res.data || [])})
+      .then(() => setLoading(false));
   };
 
   const handleApprove = (id) => {
     axiosClient.post("admin/approve-loan", { id })
       .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Loan Approved Successfully',
+          showConfirmButton: false,
+          timer: 1500
+        })
         fetchLoans();
         fetchHistory();
+      })
+      .catch(err=>{
+        console.log(err);
+        const errormessage = err.response.data.message|| err.message || "Something went wrong";
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errormessage,
+        })
       });
   };
 
   const handleDeny = (id) => {
     axiosClient.post("admin/deny-loan", { id })
       .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Loan Denied Successfully',
+          showConfirmButton: false,
+          timer: 1500
+        })
         fetchLoans();
         fetchHistory();
+      })
+      .catch(err=>{
+        console.log(err);
+        const errormessage = err.response.data.message|| err.message || "Something went wrong";
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errormessage,
+        })
       });
   };
 

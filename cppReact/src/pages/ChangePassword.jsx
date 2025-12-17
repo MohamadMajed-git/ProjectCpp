@@ -3,6 +3,7 @@ import { useStateContext } from "../context/ContextProvider";
 import axiosClient from "../axiosClient";
 import { Lock, KeyRound, Save, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function ChangePassword() {
   const newPasswordRef = useRef();
@@ -16,6 +17,20 @@ export default function ChangePassword() {
       "oldPassword":oldPasswordRef.current.value
     }).then(res=>{
       console.log(res);
+      Swal.fire({
+        icon: 'success',
+        title: 'Password Request Send Successfully',
+        showConfirmButton: false,
+        timer: 1500
+      })
+      }).catch(err=>{
+        console.log(err);
+        const errormessage = err.response.data.message|| err.message || "Something went wrong";
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errormessage,
+        })
     })
   };
   return (

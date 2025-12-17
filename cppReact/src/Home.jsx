@@ -77,20 +77,20 @@ return (
 <div className="min-h-screen bg-gray-50/50 p-6 md:p-10 font-sans">
       <div className="max-w-5xl mx-auto space-y-8">
         
-        {/* Header Section */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl shadow-lg shadow-blue-200">
               <LayoutDashboard className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Dashboard Overview</h1>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Dashboard Overview <span
+              className={`inline-block ml-2 px-4 py-2 text-lg font-semibold  text-green-800 bg-green-100 rounded-full ${userData.status=="active"?"":"bg-red-100 text-red-800"}`}
+              >{userData.status=="active"? "Active":"Hold"} </span></h1>
               <p className="text-gray-500 mt-1">Welcome back, <span className="font-semibold text-blue-600">{user?.firstName || userData?.name1}</span>!</p>
             </div>
           </div>
         </header>
 
-        {/* Quick Actions Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {quickActions.map((action, index) => (
             <button
@@ -106,10 +106,8 @@ return (
           ))}
         </div>
 
-        {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 
-          {/* Personal Details Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 h-full">
             <div className="bg-gray-50/80 px-6 py-4 border-b border-gray-100 flex items-center gap-3 backdrop-blur-sm">
               <UserCircle className="w-6 h-6 text-blue-500" />
@@ -151,8 +149,6 @@ return (
 
             </div>
           </div>
-
-          {/* Financial Account Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
             <div className="bg-gray-50/80 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
               <Wallet className="w-6 h-6 text-green-600" />
@@ -184,8 +180,6 @@ return (
             </div>
           </div>
         </div>
-
-        {/* Security Token Section (Debug) */}
         <div className="mt-8 bg-gray-900 rounded-xl p-5 border border-gray-800 shadow-lg">
           <div className="flex items-center gap-2 mb-3">
              <Key className="w-4 h-4 text-yellow-500" />

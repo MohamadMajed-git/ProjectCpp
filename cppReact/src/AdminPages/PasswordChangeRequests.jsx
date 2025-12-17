@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../context/ContextProvider";
 import { KeyRound, Mail, Check, X, ShieldAlert, Lock } from 'lucide-react';
+import Swal from "sweetalert2";
 
 export default function PasswordChangeRequests() {
     const [passwordRequest,setPasswordRequest]=useState([]);
@@ -24,9 +25,23 @@ export default function PasswordChangeRequests() {
         })
         .then(res=>{
             console.log(res);
-            alert("Password Changed Successfully");
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Change Request Approved',
+                showConfirmButton: false,
+                timer: 1500
+            })
             setReload(!reload);
         })
+        .catch(err=>{
+            console.log(err);
+            const errormessage = err.response.data.message|| err.message || "Something went wrong";
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errormessage,
+            })
+        });
         
     };
 
@@ -38,17 +53,31 @@ export default function PasswordChangeRequests() {
         })
         .then(res=>{
             console.log(res);
-            alert("Password Change Request Denied");
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Change Request Denied',
+                showConfirmButton: false,
+                timer: 1500
+            })
+
             setReload(!reload);
-        });
-    }
+        })
+        .catch(err=>{
+            console.log(err);
+            const errormessage = err.response.data.message|| err.message || "Something went wrong";
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errormessage,
+            })
+        })
+    };
 
 
 
   return (
 <div className="max-w-4xl mx-auto p-6 space-y-4">
       
-      {/* عنوان الصفحة */}
       <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6">
         <ShieldAlert className="text-orange-600" />
         Password Change Requests
@@ -73,7 +102,6 @@ export default function PasswordChangeRequests() {
                 : "bg-gray-100 border-gray-200 opacity-60 grayscale hover:opacity-70"}
             `}
           >
-            {/* شارة الترتيب */}
             <div className={`
               absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-sm
               ${isFirst ? "bg-orange-600 text-white" : "bg-gray-300 text-gray-600"}
@@ -81,7 +109,6 @@ export default function PasswordChangeRequests() {
               {index + 1}
             </div>
 
-            {/* تفاصيل الطلب */}
             <div className="flex items-center gap-4 w-full md:w-auto mb-4 md:mb-0 pl-2">
               <div className={`p-3 rounded-full ${isFirst ? "bg-orange-50 text-orange-600" : "bg-gray-200 text-gray-500"}`}>
                 <KeyRound size={24} />
@@ -99,10 +126,8 @@ export default function PasswordChangeRequests() {
               </div>
             </div>
 
-            {/* الأزرار */}
             <div className="flex items-center gap-3">
               
-              {/* زر القبول */}
               <button 
                 className={`
                   flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200
@@ -117,7 +142,6 @@ export default function PasswordChangeRequests() {
                 <span>Accept</span>
               </button> 
 
-              {/* زر الرفض */}
               <button 
                 className={`
                   flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200
