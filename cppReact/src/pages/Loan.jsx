@@ -2,7 +2,6 @@ import { useRef, useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../context/ContextProvider";
 import { HandCoins, History, Calendar, DollarSign, FileText, Search, AlertCircle } from 'lucide-react';
-import Swal from "sweetalert2";
 
 export default function Loan() {
   const moneyRef = useRef(null);
@@ -36,21 +35,7 @@ export default function Loan() {
       })
       .then((res) => {
         console.log(res.data);
-        Swal.fire({
-          icon: 'success',
-          title: 'Loan request submitted successfully',
-          showConfirmButton: false,
-          timer: 1500
-        })
         fetchLoanHistory(); // Refresh history after submitting
-      }).catch(err => {
-        console.log(err);
-        const errormessage = err.response.data.message || err.message || "Something went wrong";
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: errormessage,
-        })
       });
   };
 
@@ -66,6 +51,7 @@ export default function Loan() {
   }
   return "bg-gray-100 text-gray-800 border-gray-200";
 };
+  // Fetch loan history
   const fetchLoanHistory = () => {
     setLoading(true);
     axiosClient
@@ -81,6 +67,7 @@ export default function Loan() {
   return (
 <div className="min-h-screen bg-gray-50/50 p-6 md:p-10 space-y-8">
       
+      {/* القسم الأول: نموذج طلب القرض */}
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="bg-indigo-600 p-6 flex items-center gap-3 text-white">
            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
@@ -111,6 +98,7 @@ export default function Loan() {
               </div>
             </div>
 
+            {/* حقل المدة */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 ml-1">Duration</label>
               <div className="relative">
@@ -132,6 +120,7 @@ export default function Loan() {
               </div>
             </div>
 
+            {/* زر الإرسال */}
             <button
               className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-md transition-all duration-200 active:scale-95 flex items-center justify-center gap-2"
               onClick={handleSubmit}
@@ -143,6 +132,7 @@ export default function Loan() {
         </div>
       </div>
 
+      {/* القسم الثاني: جدول السجل */}
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-4 px-1">
           <History className="text-gray-500" />
@@ -185,6 +175,7 @@ export default function Loan() {
                           </div>
                         </td>
                         <td className="p-4 font-bold text-gray-800">
+                           {/* يمكنك استخدام دالة تنسيق العملة هنا */}
                            ${loan.loan_cost}
                         </td>
                         <td className="p-4 text-gray-500">{loan.date}</td>

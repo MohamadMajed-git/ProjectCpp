@@ -6,15 +6,14 @@
 #include <iostream>
 #include "Classes/SDLL.hpp"
 #include "Classes/Branch.hpp"
+#include "Classes/FixedSSl.hpp"
+#include "Classes/FQue.hpp"
 using namespace std;
 using namespace crow;
 
 void setupRoutes(crow::SimpleApp &app)
 {
-
-
-
-    //!MOOOOOHHHHAAAAMMMMAAAADDDDD
+    //! MOOOOOHHHHAAAAMMMMAAAADDDDD
     CROW_ROUTE(app, "/")([]()
                          { return "Server is Online!"; });
     CROW_ROUTE(app, "/signup")([]()
@@ -87,11 +86,11 @@ void setupRoutes(crow::SimpleApp &app)
                                                           crow::json::wvalue response;
                                                           response["status"] = "error";
                                                           response["message"] = "User not added!" + errorMsg;
-                                                          return crow::response(400, response);}
-    });
+                                                          return crow::response(400, response);} });
 
     CROW_ROUTE(app, "/api/login")
-        .methods("POST"_method, "OPTIONS"_method)([](const request &req){
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
        
         json::rvalue data =json::load(req.body);
@@ -143,24 +142,19 @@ void setupRoutes(crow::SimpleApp &app)
             return crow::response(401,response);
         } });
 
-
-
-
-
     CROW_ROUTE(app, "/api/holded-accounts")
         .methods("GET"_method, "OPTIONS"_method)([](const request &req)
-                                                {
-        if (req.method == "OPTIONS"_method) return crow::response(200);
-        json::wvalue response;
-        response["accounts"] = activateAccounts.getAccountsJSON();
-        return crow::response(200, response);
-                                                   
-    });
-
+                                                 {
+                                                     if (req.method == "OPTIONS"_method)
+                                                         return crow::response(200);
+                                                     json::wvalue response;
+                                                     response["accounts"] = activateAccounts.getAccountsJSON();
+                                                     return crow::response(200, response);
+                                                 });
 
     CROW_ROUTE(app, "/api/holded-accounts/activate")
-    .methods("POST"_method, "OPTIONS"_method)([](const request &req)
-    {
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
         string email = activateAccounts.getFront();
         activateAccounts.removeAccount();
@@ -177,12 +171,11 @@ void setupRoutes(crow::SimpleApp &app)
         }
         json::wvalue response;
         response["status"] = "success";
-        return crow::response(200, response);
-    });
+        return crow::response(200, response); });
 
     CROW_ROUTE(app, "/api/holded-accounts/delete")
-    .methods("POST"_method, "OPTIONS"_method)([](const request &req)
-    {
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
         string email = activateAccounts.getFront();
         string query = "DELETE FROM users WHERE email = '" + email + "'";
@@ -199,35 +192,28 @@ void setupRoutes(crow::SimpleApp &app)
         userList.deleteNodeByEmail(email);
         json::wvalue response;
         response["status"] = "success";
-        return crow::response(200, response);
-    });
-   
+        return crow::response(200, response); });
 
+    CROW_ROUTE(app, "/api/get-user-data")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
+                                                      if (req.method == "OPTIONS"_method)
+                                                          return crow::response(200);
 
+                                                      json::rvalue data = json::load(req.body);
+                                                      if (!data)
+                                                          return response(400, "Invalid JSON");
 
+                                                      string email = data.has("email") ? (string)data["email"].s() : (string) "";
 
+                                                      json::wvalue response;
+                                                      response["user"] = userList.getDataByEmail(email);
+                                                      return crow::response(200, response);
+                                                  });
 
-    CROW_ROUTE(app,"/api/get-user-data")
-    .methods("POST"_method,"OPTIONS"_method)
-    ([](const request &req){
-        if (req.method == "OPTIONS"_method) return crow::response(200);
-
-        json::rvalue data=json::load(req.body);
-        if(!data)return response(400,"Invalid JSON");
-
-        string email=data.has("email")?(string)data["email"].s():(string)"";
-        
-        json::wvalue response;
-        response["user"]=userList.getDataByEmail(email);
-        return crow::response(200,response);
-
-
-    });
-
-
-    CROW_ROUTE(app,"/api/send-money")
-    .methods("POST"_method,"OPTIONS"_method)
-    ([](const request &req){
+    CROW_ROUTE(app, "/api/send-money")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
         json::rvalue data=json::load(req.body);
         
@@ -295,16 +281,11 @@ void setupRoutes(crow::SimpleApp &app)
         }
         json::wvalue response;
         response["status"] = "success";
-        return crow::response(200, response);
-    });
+        return crow::response(200, response); });
 
-
-
-
-
-    CROW_ROUTE(app,"/api/user-transaction")
-    .methods("POST"_method,"OPTIONS"_method)
-    ([](const request &req){
+    CROW_ROUTE(app, "/api/user-transaction")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
 
         json::rvalue data=json::load(req.body);
@@ -313,26 +294,20 @@ void setupRoutes(crow::SimpleApp &app)
         string accountNumber=data.has("accountNumber")?(string)data["accountNumber"].s():(string)"";
         json::wvalue response;
         response["transactions"]=transactionList.getUserTransactions(accountNumber);
-        return crow::response(200,response);
-    });
-        
+        return crow::response(200,response); });
 
-
-    CROW_ROUTE(app,"/api/all-transactions")
-    .methods("GET"_method,"OPTIONS"_method)
-    ([](const request &req){
+    CROW_ROUTE(app, "/api/all-transactions")
+        .methods("GET"_method, "OPTIONS"_method)([](const request &req)
+                                                 {
         if (req.method == "OPTIONS"_method) return crow::response(200);
 
         json::wvalue response;
         response["transactions"]=transactionList.getAllTransactions();
-        return crow::response(200,response);
-    });
+        return crow::response(200,response); });
 
-
-
-    CROW_ROUTE(app,"/api/search-transaction")
-    .methods("POST"_method,"OPTIONS"_method)
-    ([](const request &req){
+    CROW_ROUTE(app, "/api/search-transaction")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
 
         json::rvalue data=json::load(req.body);
@@ -341,14 +316,11 @@ void setupRoutes(crow::SimpleApp &app)
         int searchId=data.has("searchId")?(int)data["searchId"].i():0;
         json::wvalue response;
         response["transactions"]=transactionList.getTransactionById(searchId);
-        return crow::response(200,response);
-    });
+        return crow::response(200,response); });
 
-
-
-    CROW_ROUTE(app,"/api/change-password")
-    .methods("POST"_method,"OPTIONS"_method)
-    ([](const request &req){
+    CROW_ROUTE(app, "/api/change-password")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
 
         json::rvalue data=json::load(req.body);
@@ -388,13 +360,11 @@ void setupRoutes(crow::SimpleApp &app)
         
         json::wvalue response;
         response["status"] = "success";
-        return crow::response(200, response);
-    });
+        return crow::response(200, response); });
 
-
-    CROW_ROUTE(app,"/api/password-change-requests")
-    .methods("POST"_method,"OPTIONS"_method)
-    ([](const request &req){
+    CROW_ROUTE(app, "/api/password-change-requests")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
         json::rvalue data=json::load(req.body);
         if(!data)return response(400,"Invalid JSON");
@@ -408,61 +378,64 @@ void setupRoutes(crow::SimpleApp &app)
         }
         json::wvalue response;
         response["requests"] = stackPassword.getAllData();
-        return crow::response(200, response);
-    });
+        return crow::response(200, response); });
 
-    CROW_ROUTE(app,"/api/approve-password-change")
-    .methods("POST"_method,"OPTIONS"_method)
-    ([](const request &req){
-        if (req.method == "OPTIONS"_method) return crow::response(200);
-        json::rvalue data=json::load(req.body);
-        if(!data)return response(400,"Invalid JSON");
-        string email=data.has("email")?(string)data["email"].s():(string)"";
-        string newPassword=data.has("newPassword")?(string)data["newPassword"].s():(string)"";
-        string userEmail=data.has("userEmail")?(string)data["userEmail"].s():(string)"";
-        bool isAdmin = userList.checkIfAdmin(email);
-        if(isAdmin==false){
-            json::wvalue response;
-            response["status"] = "error";
-            response["message"] = "Unauthorized";
-            return crow::response(401, response);
-        }
-        if(stackPassword.isEmpty()){
-            json::wvalue response;
-            response["status"] = "error";
-            response["message"] = "No password change requests";
-            return crow::response(400, response);
-        }
-            string query = "UPDATE users SET password = '" + newPassword + "' WHERE email = '" + userEmail + "'";
-            if(mysql_query(conn, query.c_str()) != 0)
-            {
-                string errorMsg = mysql_error(conn);
-                cout << "MySQL Query Error: " << errorMsg << endl;
-                crow::json::wvalue response;
-                response["status"] = "error";
-                response["message"] = "somthing went wrong" + errorMsg;
-                return crow::response(400, response);
-            }
-            query = "UPDATE `password-requests` SET status = 'approved' WHERE email = '" + userEmail + "' AND status = 'pending'";
-            if(mysql_query(conn, query.c_str()) != 0)
-            {
-                string errorMsg = mysql_error(conn);
-                cout << "MySQL Query Error: " << errorMsg << endl;
-                crow::json::wvalue response;
-                response["status"] = "error";
-                response["message"] = "somthing went wrong" + errorMsg;
-                return crow::response(400, response);
-            }
-        userList.updatePassword(userEmail, newPassword);
-        stackPassword.popRequest();
-        json::wvalue response;
-        response["status"] = "success";
-        return crow::response(200, response);
-        
-    });
+    CROW_ROUTE(app, "/api/approve-password-change")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
+                                                      if (req.method == "OPTIONS"_method)
+                                                          return crow::response(200);
+                                                      json::rvalue data = json::load(req.body);
+                                                      if (!data)
+                                                          return response(400, "Invalid JSON");
+                                                      string email = data.has("email") ? (string)data["email"].s() : (string) "";
+                                                      string newPassword = data.has("newPassword") ? (string)data["newPassword"].s() : (string) "";
+                                                      string userEmail = data.has("userEmail") ? (string)data["userEmail"].s() : (string) "";
+                                                      bool isAdmin = userList.checkIfAdmin(email);
+                                                      if (isAdmin == false)
+                                                      {
+                                                          json::wvalue response;
+                                                          response["status"] = "error";
+                                                          response["message"] = "Unauthorized";
+                                                          return crow::response(401, response);
+                                                      }
+                                                      if (stackPassword.isEmpty())
+                                                      {
+                                                          json::wvalue response;
+                                                          response["status"] = "error";
+                                                          response["message"] = "No password change requests";
+                                                          return crow::response(400, response);
+                                                      }
+                                                      string query = "UPDATE users SET password = '" + newPassword + "' WHERE email = '" + userEmail + "'";
+                                                      if (mysql_query(conn, query.c_str()) != 0)
+                                                      {
+                                                          string errorMsg = mysql_error(conn);
+                                                          cout << "MySQL Query Error: " << errorMsg << endl;
+                                                          crow::json::wvalue response;
+                                                          response["status"] = "error";
+                                                          response["message"] = "somthing went wrong" + errorMsg;
+                                                          return crow::response(400, response);
+                                                      }
+                                                      query = "UPDATE `password-requests` SET status = 'approved' WHERE email = '" + userEmail + "' AND status = 'pending'";
+                                                      if (mysql_query(conn, query.c_str()) != 0)
+                                                      {
+                                                          string errorMsg = mysql_error(conn);
+                                                          cout << "MySQL Query Error: " << errorMsg << endl;
+                                                          crow::json::wvalue response;
+                                                          response["status"] = "error";
+                                                          response["message"] = "somthing went wrong" + errorMsg;
+                                                          return crow::response(400, response);
+                                                      }
+                                                      userList.updatePassword(userEmail, newPassword);
+                                                      stackPassword.popRequest();
+                                                      json::wvalue response;
+                                                      response["status"] = "success";
+                                                      return crow::response(200, response);
+                                                  });
 
-    CROW_ROUTE(app,"/api/deny-password-change")
-    .methods("POST"_method,"OPTIONS"_method)([](const request &req){
+    CROW_ROUTE(app, "/api/deny-password-change")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
         if (req.method == "OPTIONS"_method) return crow::response(200);
         json::rvalue data=json::load(req.body);
         if(!data)return response(400,"Invalid JSON");
@@ -495,117 +468,94 @@ void setupRoutes(crow::SimpleApp &app)
         stackPassword.popRequest();
         json::wvalue response;
         response["status"] = "success";
-        return crow::response(200, response);
-        });
+        return crow::response(200, response); });
 
+    CROW_ROUTE(app, "/api/adman-home-data")
+        .methods("POST"_method)([](const request &req)
+                                {
+                                    json::rvalue data = json::load(req.body);
+                                    if (!data)
+                                        return response(400, "Invalid JSON");
+                                    string email = data.has("email") ? (string)data["email"].s() : (string) "";
+                                    bool isAdmin = userList.checkIfAdmin(email);
+                                    if (isAdmin == false)
+                                    {
+                                        json::wvalue response;
+                                        response["status"] = "error";
+                                        response["message"] = "Unauthorized";
+                                        return crow::response(401, response);
+                                    }
+                                    json::wvalue response;
+                                    response["status"] = "success";
+                                    response["userCount"] = userList.getUserCount();
+                                    response["totalBalance"] = userList.getTotalBalance();
+                                    response["totalLoanRequest"] = LoanQ.getTotalLoanRequest();
+                                    return crow::response(200, response);
+                                });
+}
 
-
-
-
-
-        CROW_ROUTE(app,"/api/adman-home-data")
-        .methods("POST"_method)([](const request &req){
-            json::rvalue data=json::load(req.body);
-            if(!data)return response(400,"Invalid JSON");
-            string email=data.has("email")?(string)data["email"].s():(string)"";
-            bool isAdmin = userList.checkIfAdmin(email);
-            if(isAdmin==false){
-                json::wvalue response;
-                response["status"] = "error";
-                response["message"] = "Unauthorized";
-                return crow::response(401, response);
-            }
-            json::wvalue response;
-            response["status"] = "success";
-            response["userCount"] = userList.getUserCount();
-            response["totalBalance"] = userList.getTotalBalance();
-            response["totalLoanRequest"] = LoanQ.getTotalLoanRequest();
-            return crow::response(200, response);
-            
-        });
-        
-        
-        
-        
-        
-
-        
-        
-        
-        
-        
-
-        
-        
-    }
-    
 //! yoooooooooooooooosssssssssseeeeeffff
 
-
-
-void setupLoanRoutes(crow::SimpleApp &app) {
-        CROW_ROUTE(app,"/api/submit-loan-request")
-    .methods("POST"_method,"OPTIONS"_method)([](const request &req){
-                if (req.method == "OPTIONS"_method) return crow::response(200);
-                json::rvalue data=json::load(req.body);
-            if(!data)return response(400,"Invalid JSON");
-            string email=data.has("email")?(string)data["email"].s():(string)"";
-            string duration=data.has("duration")?(string)data["duration"].s():(string)"";
-            if(userList.isActiveByEmail(email)==false){
-                json::wvalue err;
-                err["message"]="your account is not active";
-                return crow::response(400,err);
-            }
-            int money=data.has("moneyOfLoan")?(int)data["moneyOfLoan"]:0;
-            if(!userList.checkIfUserExist(email)){
-                cout<<1;
-                json::wvalue err;
-                err["message"]="the user not exist";
-                return crow::response(400,err);
-            }
-            string query="INSERT INTO loans (email,states,duration,loan_cost,date) VALUES('"+email+"',2,'"+duration+"','"+to_string(money)+"','"+currentDate()+"') ";
-            if(mysql_query(conn,query.c_str())==0){
-                long long id = mysql_insert_id(conn);
-                LoanQ.insert(id,email,2,duration,to_string(money),currentDate());
-                LoanSSL.insertAtL(id,email,2,duration,to_string(money),currentDate());
-                return crow::response(200,"ok");
-            }
-            else{
-                json::wvalue err;
-                err["message"]=mysql_error(conn);
-                return crow::response(400,err);
-            }
-
-    });
-
-
+void setupLoanRoutes(crow::SimpleApp &app)
+{
+    CROW_ROUTE(app, "/api/submit-loan-request")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                {
+                                                    if (req.method == "OPTIONS"_method)
+                                                        return crow::response(200);
+                                                    json::rvalue data = json::load(req.body);
+                                                    if (!data)
+                                                        return response(400, "Invalid JSON");
+                                                    string email = data.has("email") ? (string)data["email"].s() : (string) "";
+                                                    string duration = data.has("duration") ? (string)data["duration"].s() : (string) "";
+                                                    long long int money = data.has("moneyOfLoan") ? (int)data["moneyOfLoan"] : 0;
+                                                    if (!userList.checkIfUserExist(email))
+                                                    {
+                                                        cout << 1;
+                                                        json::wvalue err;
+                                                        err["message"] = "the user not exist";
+                                                        return crow::response(400, err);
+                                                    }
+                                                    string query = "INSERT INTO loans (email,states,duration,loan_cost,date) VALUES('" + email + "',2,'" + duration + "','" + to_string(money) + "','" + currentDate() + "') ";
+                                                    if (mysql_query(conn, query.c_str()) == 0)
+                                                    {
+                                                        long long id = mysql_insert_id(conn);
+                                                        LoanQ.insert(id, email, 2, duration, to_string(money), currentDate());
+                                                        LoanSSL.insertAtL(id, email, 2, duration, to_string(money), currentDate());
+                                                        return crow::response(200, "ok");
+                                                    }
+                                                    else
+                                                    {
+                                                        json::wvalue err;
+                                                        err["message"] = mysql_error(conn);
+                                                        return crow::response(400, err);
+                                                    }
+                                                });
 
     CROW_ROUTE(app, "/api/admin/get-all-loans")
-.methods("GET"_method)
-([]() {
-    return crow::response(200, LoanQ.getAllLoansJSON());
-});
+        .methods("GET"_method)([]()
+                               { return crow::response(200, LoanQ.getAllLoansJSON()); });
 
-
-CROW_ROUTE(app, "/api/admin/approve-loan")
-.methods("POST"_method, "OPTIONS"_method)
-([](const crow::request& req) {
+    CROW_ROUTE(app, "/api/admin/approve-loan")
+        .methods("POST"_method, "OPTIONS"_method)([](const crow::request &req){
     if (req.method == "OPTIONS"_method) return crow::response(200);
 
     auto data = crow::json::load(req.body);
     if (!data) return crow::response(400, "Invalid JSON");
 
     int id = data["id"].i();
-    std::vector<std::string> data1 = LoanQ.getEmailAndMoney(id);
-    std::string email = data1[0];
-    std::string money = data1[1];
+    vector<string> data1 = LoanQ.getEmailAndMoney(id);
+        if (data1.size() < 2) {
+    return crow::response(400, "ID not found in FixedQueue");
+    }
+    string email = data1[0];
+    string money = data1[1];
 
-    int moneyInt = stoi(money);
+    long long int moneyInt = stoi(money);
     string query = "UPDATE loans SET states = 1 WHERE id = " + to_string(id);
     string query2 = "UPDATE users SET balance = balance + " + to_string(moneyInt) +" WHERE email = '" + email + "'";
 
     if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){   
-
     LoanQ.changestates(id, 1); // approveds
     LoanSSL.changestates(id, 1); // approveds
     LoanQ.remove();
@@ -619,14 +569,12 @@ CROW_ROUTE(app, "/api/admin/approve-loan")
             }
 
 
-    return crow::response(200, "approved");
-});
+    return crow::response(200, "approved"); });
 
-
-//////////////////////////////////
-CROW_ROUTE(app, "/api/admin/deny-loan")
-.methods("POST"_method, "OPTIONS"_method)
-([](const crow::request& req) {
+    //////////////////////////////////
+    CROW_ROUTE(app, "/api/admin/deny-loan")
+        .methods("POST"_method, "OPTIONS"_method)([](const crow::request &req)
+                                                  {
     if (req.method == "OPTIONS"_method) return crow::response(200);
 
     auto data = crow::json::load(req.body);
@@ -644,132 +592,198 @@ CROW_ROUTE(app, "/api/admin/deny-loan")
         }
 
 
-    return crow::response(200, "denied");
-});
+    return crow::response(200, "denied"); });
 
+    CROW_ROUTE(app, "/api/admin/get-all-loans-history")
+        .methods("GET"_method)([]()
+                               { return crow::response(200, LoanSSL.getAllLoansJSON()); });
 
-
-
-CROW_ROUTE(app, "/api/admin/get-all-loans-history")
-.methods("GET"_method)
-([]() {
-    return crow::response(200, LoanSSL.getAllLoansJSON());
-});
-
-CROW_ROUTE(app, "/api/client/get-loans-history")
-.methods("GET"_method)
-([](const crow::request& req) {
+    CROW_ROUTE(app, "/api/client/get-loans-history")
+        .methods("GET"_method)([](const crow::request &req)
+                               {
     auto email = req.url_params.get("email");
-    return crow::response(200, LoanSSL.getLoansByEmailJSON(email));
-});
-
-
+    return crow::response(200, LoanSSL.getLoansByEmailJSON(email)); });
 }
 
 
+//!-----------------------
+void setupFixedRoutes(crow::SimpleApp &app)
+{
+    CROW_ROUTE(app, "/api/submit-fixed-request")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
+                                                      if (req.method == "OPTIONS"_method)
+                                                          return crow::response(200);
+                                                      json::rvalue data = json::load(req.body);
+                                                      if (!data)
+                                                          return response(400, "Invalid JSON");
+                                                      string email = data.has("email") ? (string)data["email"].s() : (string) "";
+                                                      string duration = data.has("duration") ? (string)data["duration"].s() : (string) "";
+                                                      long long int profit = data.has("profit") ? (long long int)data["profit"] : 0;
+                                                      long long int totalamount = data.has("amount") ? (long long int)data["amount"] : 0;
+
+                                                      if (!userList.checkIfUserExist(email))
+                                                      {
+                                                          cout << 1;
+                                                          json::wvalue err;
+                                                          err["message"] = "the user not exist";
+                                                          return crow::response(400, err);
+                                                      }
+                                                      string query = "INSERT INTO Fixed (email,duration,amount,profit,fixed_date,status) VALUES('" + email + "','" + duration + "','" + to_string(totalamount) + "','" + to_string(profit) + "','" + currentDate() + "', 2)";
+                                                      if (mysql_query(conn, query.c_str()) == 0)
+                                                      {
+                                                          int id = mysql_insert_id(conn);
+                                                          FixedQ.insert(id, email, duration, totalamount, profit, currentDate(), 2);
+                                                          FixedSSL.insertAtL(id, email, duration, totalamount, profit, currentDate(), 2);
+                                                          return crow::response(200, "ok");
+                                                      }
+                                                      else
+                                                      {
+                                                          json::wvalue err;
+                                                          err["message"] = mysql_error(conn);
+                                                          return crow::response(400, err);
+                                                      }
+                                                  });
+
+    CROW_ROUTE(app, "/api/admin/get-all-fixed")
+        .methods("GET"_method)([]()
+                               { return crow::response(200, FixedQ.getAllFixedJSON()); });
+
+    CROW_ROUTE(app, "/api/admin/approve-fixed")
+        .methods("POST"_method, "OPTIONS"_method)([](const crow::request &req)
+                                                  {
+    if (req.method == "OPTIONS"_method) return crow::response(200);
+
+    auto data = crow::json::load(req.body);
+    if (!data) return crow::response(400, "Invalid JSON");
+
+    int id = data["id"].i();
+    vector<string> data1 = FixedQ.getEmailAndMoney(id);
+    if (data1.size() < 2) {
+    return crow::response(400, "ID not found in FixedQueue");
+    }
+    string email = data1[0];
+    string amount = data1[1];
+
+    long long amountInt = stoll(amount);
+    string query = "UPDATE Fixed SET status = 1 WHERE id = " + to_string(id);
+    string query2 = "UPDATE users SET balance = balance - " + to_string(amountInt) + " WHERE email = '" + email + "'";
+
+    if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){   
+    FixedQ.changestatus(id, 1); // approveds
+    FixedSSL.changeStatusByid(id, 1); // approveds
+    FixedQ.remove();
+
+        return crow::response(200, "State updated");
+        }
+        else{
+                json::wvalue err;
+                err["message"]=mysql_error(conn);
+                return crow::response(400,err);
+            }
 
 
+    return crow::response(200, "approved"); });
+
+    ////////////////////////////////
+    CROW_ROUTE(app, "/api/admin/deny-fixed")
+        .methods("POST"_method, "OPTIONS"_method)([](const crow::request &req)
+                                                  {
+    if (req.method == "OPTIONS"_method) return crow::response(200);
+
+    auto data = crow::json::load(req.body);
+    if (!data) return crow::response(400, "Invalid JSON");
+
+    int id = data["id"].i();
+    string query = "UPDATE Fixed SET status = 3 WHERE id = " + to_string(id);
+    if(mysql_query(conn,query.c_str())==0){   
+
+    FixedQ.changestatus(id, 3); // deny
+    FixedSSL.changeStatusByid(id, 3); // deny
+    FixedQ.remove();
+        return crow::response(200, "State updated");
+
+        }
 
 
+    return crow::response(200, "denied"); });
 
+    CROW_ROUTE(app, "/api/admin/get-all-fixed-history")
+        .methods("GET"_method)([]()
+                               { return crow::response(200, FixedSSL.getAllFixedJSON()); });
 
+    CROW_ROUTE(app, "/api/client/get-fixed-history")
+        .methods("POST"_method)([](const crow::request &req)
+                                {
+    crow::json::rvalue data = crow::json::load(req.body);
+    if (!data) return crow::response(400, "Invalid JSON");
+    string email = data.has("email") ? (string)data["email"].s() : (string)"";
+    return crow::response(200, FixedSSL.getFixedByEmailJSON(email)); });
+}
+//!-----------------------------------
+void setupBranchRoutes(crow::SimpleApp& app) {
 
+   
+    CROW_ROUTE(app, "/api/admin/branches")
+    .methods("GET"_method, "POST"_method, "PUT"_method, "DELETE"_method)
+    ([&](const crow::request& req){
 
+       
+        if (req.method == "GET"_method)
+        {
+            return crow::response(branchList.getAll());
+        }
 
+        auto body = crow::json::load(req.body);
+        if (!body)
+            return crow::response(400, "Invalid JSON");
 
+        if (req.method == "POST"_method)
+        {
+            branchList.insert(
+                body["id"].i(),
+                body["name"].s(),
+                body["location_link"].s(),
+                body["phone"].s(),
+                body["address"].s()
+            );
+            return crow::response(201, "Branch added");
+        }
 
+        if (req.method == "PUT"_method)
+        {
+            int id = body["id"].i();
 
+            if (!branchList.removeById(id))
+                return crow::response(404, "Branch not found");
 
+            branchList.insert(
+                id,
+                body["name"].s(),
+                body["location_link"].s(),
+                body["phone"].s(),
+                body["address"].s()
+            );
+            return crow::response("Branch updated");
+        }
 
-void setupBranchRoutes(crow::SimpleApp &app) {
-
-    // CROW_ROUTE(app, "/api/branches").methods("GET"_method)
-    // ([&](const crow::request &req){
-    //     auto query_dict = crow::query_string(req.url);
-    //     string search = query_dict.get("search") ? query_dict.get("search") : "";
-
-    //     crow::json::wvalue result;
-    //     int index = 0;
         
+        if (req.method == "DELETE"_method)
+        {
+            int id = body["id"].i();
 
-    //     return crow::response(200, branchList.getAll());
-    // });
+            if (!branchList.removeById(id))
+                return crow::response(404, "Branch not found");
 
-    // GET فرع بالـ ID
-    CROW_ROUTE(app, "/api/branches").methods("GET"_method)
-    ([](){
-        return crow::response(200,branchList.getAll());
+            return crow::response("Branch deleted");
+        }
+
+        return crow::response(405);
     });
-
-    // POST لإضافة فرع جديد
-    // CROW_ROUTE(app, "/api/branches").methods("POST"_method)
-    // ([&](const crow::request &req){
-    //     auto body = crow::json::load(req.body);
-    //     if(!body) {
-    //         crow::json::wvalue resErr;
-    //         resErr["error"] = "Invalid JSON";
-    //         return crow::response(400, resErr);
-    //     }
-
-    //     string name = body["branch_name"].s();
-    //     string loc = body["location_link"].s();
-    //     string phone = body["phone"].s();
-    //     string addr = body["address"].s();
-
-    //     static int tempId = 1000;
-    //     branchList.insert(tempId++, name, loc, phone, addr);
-
-    //     crow::json::wvalue res;
-    //     res["message"] = "Branch added successfully";
-    //     return crow::response(res);
-    // });
-
-    // DELETE فرع
-    // CROW_ROUTE(app, "/branches/<int>").methods("DELETE"_method)
-    // ([&](int id){
-    //     bool removed = branchList.removeById(id);
-    //     crow::json::wvalue res;
-    //     if(removed) {
-    //         res["message"] = "Branch deleted successfully";
-    //         return crow::response(res);
-    //     } else {
-    //         res["error"] = "Branch not found";
-    //         return crow::response(404, res);
-    //     }
-    // });
-
-    // PUT لتعديل فرع
-    // CROW_ROUTE(app, "/branches/<int>").methods("PUT"_method)
-    // ([&](const crow::request &req, int id){
-        
-    //     if(!branch1) {
-    //         crow::json::wvalue resErr;
-    //         resErr["error"] = "Branch not found";
-    //         return crow::response(404, resErr);
-    //     }
-
-    //     auto body = crow::json::load(req.body);
-    //     if(!body) {
-    //         crow::json::wvalue resErr;
-    //         resErr["error"] = "Invalid JSON";
-    //         return crow::response(400, resErr);
-    //     }
-
-    //     if(body.has("branch_name")) branch1->branch_name = body["branch_name"].s();
-    //     if(body.has("location_link")) branch1->location_link = body["location_link"].s();
-    //     if(body.has("phone")) branch1->phone = body["phone"].s();
-    //     if(body.has("address")) branch1->address = body["address"].s();
-
-    //     crow::json::wvalue res;
-    //     res["message"] = "Branch updated successfully";
-    //     res["branch"]["id"] = branch1->id;
-    //     res["branch"]["branch_name"] = branch1->branch_name;
-    //     return crow::response(res);
-    // });
 
 
      // GET كل الفروع للمستخدم
-    CROW_ROUTE(app, "/user/branches").methods("GET"_method)
+    CROW_ROUTE(app, "/api/user/branches").methods("GET"_method)
     ([&](){
         crow::json::wvalue result;
         result = branchList.getAll();
@@ -782,9 +796,5 @@ void setupBranchRoutes(crow::SimpleApp &app) {
 
 
 }
-
-
-
-
 
 

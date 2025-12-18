@@ -12,6 +12,9 @@
 //AHMED
 #include "Classes/Branch.hpp"
 
+//Abdelsalam
+#include "Classes/FixedSSl.hpp"
+#include "Classes/FQue.hpp"
 using namespace std;
 //mohammad
 extern SLL userList; 
@@ -24,6 +27,9 @@ extern LoanSLL LoanSSL;
 extern LoanQueue LoanQ;
 string currentDate();
 
+//Abdelsalam
+extern FixedSLL FixedSSL;
+extern FixedQueue FixedQ;
 
 
 //AHMED

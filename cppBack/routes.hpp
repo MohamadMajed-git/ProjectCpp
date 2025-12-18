@@ -3,3 +3,5 @@
 void setupRoutes(crow::SimpleApp& app);
 void setupBranchRoutes(crow::SimpleApp &app);
 void setupLoanRoutes(crow::SimpleApp &app);
+void setupFixedRoutes(crow::SimpleApp &app);
+

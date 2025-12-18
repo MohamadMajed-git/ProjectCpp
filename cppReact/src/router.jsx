@@ -17,7 +17,8 @@ import Loan from "./pages/Loan";
 import ChangePassword from "./pages/ChangePassword";
 import PasswordChangeRequests from "./AdminPages/PasswordChangeRequests";
 import HandleLoans from "./AdminPages/HandleLoan";
-
+import Fixed from "./pages/Fixed";
+import HandleFixed from "../../../../Downloads/ProjectCpp-main (2)/ProjectCpp-main (2)/ProjectCpp-main/cppReact/src/AdminPages/HandleFixed";
 const router = createBrowserRouter([
 
     {
@@ -42,7 +43,7 @@ const router = createBrowserRouter([
                 path: "home",
                 element: <Home />
             }, {
-                path: "branches",
+                path: "/user/branches",
                 element: <Branches />
             },
             {
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
             {
                 path: "change-password",
                 element: <ChangePassword />
+            },
+            {
+                path: "fixed-request",
+                element: <Fixed />
             }
         ]
     },
@@ -90,6 +95,9 @@ const router = createBrowserRouter([
             {
                 path: "handle-loan-request",
                 element: <HandleLoans />
+            }, {
+                path: "handle-fixed-request",
+                element: <HandleFixed />
             }
 
         ]

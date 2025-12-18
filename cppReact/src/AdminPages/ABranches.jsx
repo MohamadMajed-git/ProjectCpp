@@ -18,7 +18,7 @@ export default function ABranches() {
 
   const loadBranches = async () => {
     try {
-      const res = await axiosClient.get("/branches");
+      const res = await axiosClient.get("/admin/branches");
 
       setBranches(res.data==null ? [] : res.data);
     } catch (err) {

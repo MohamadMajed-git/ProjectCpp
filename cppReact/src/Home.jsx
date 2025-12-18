@@ -69,7 +69,19 @@ export default function Home() {
       icon: <Lock size={20} />, 
       color: "bg-orange-600", 
       hover: "hover:bg-orange-700" 
-    },
+    },{
+      label: "Request Fixed",
+      path: "/fixed-request",
+      icon: <HandCoins size={20} />,
+      color: "bg-yellow-600",
+      hover: "hover:bg-yellow-700"
+    },{
+      label: "Branches",
+      path: "/user/branches",
+      icon: <Wallet size={20} />,
+      color: "bg-pink-600",
+      hover: "hover:bg-pink-700"
+    }
   ];
 
 

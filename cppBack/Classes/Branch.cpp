@@ -93,15 +93,95 @@ crow::json::wvalue BranchList::findById(int id) {
 //         }
 //         else if(parent->left ){}
 //     }
-        
-
-
-
-
-
-
-
 // }
+
+
+
+
+
+
+
+bool BranchList::removeById(int id)
+{
+    Branch* current = root;
+    Branch* parent = nullptr;
+
+    
+    while (current && current->id != id)
+    {
+        parent = current;
+        if (id < current->id)
+            current = current->left;
+        else
+            current = current->right;
+    }
+
+    if (!current)
+        return false; 
+
+
+    if (!current->left && !current->right)
+    {
+        if (current == root)
+            root = nullptr;
+        else if (parent->left == current)
+            parent->left = nullptr;
+        else
+            parent->right = nullptr;
+
+        delete current;
+    }
+
+
+
+    else if (!current->left || !current->right)
+    {
+        Branch* child = current->left ? current->left : current->right;
+
+        if (current == root)
+            root = child;
+        else if (parent->left == current)
+            parent->left = child;
+        else
+            parent->right = child;
+
+        delete current;
+    }
+
+    else
+    {
+        Branch* successor = current->right;
+        Branch* successorParent = current;
+
+        while (successor->left)
+        {
+            successorParent = successor;
+            successor = successor->left;
+        }
+
+       
+        current->id = successor->id;
+        current->branch_name = successor->branch_name; 
+
+        if (successorParent->left == successor)
+            successorParent->left = successor->right;
+        else
+            successorParent->right = successor->right;
+
+        delete successor;
+    }
+
+    return true;
+}
+
+
+
+
+
+
+
+
+
 
 
 void BranchList::makeVectorList(Branch* root, vector<crow::json::wvalue>& branches){

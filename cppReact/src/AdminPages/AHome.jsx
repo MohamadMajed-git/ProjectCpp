@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ShieldAlert, History, Building2, KeyRound, LayoutDashboard } from 'lucide-react';
+import { ShieldAlert, History, Building2, KeyRound, LayoutDashboard,HandCoins } from 'lucide-react';
 import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../context/ContextProvider";
@@ -56,6 +56,14 @@ const menuItems = [
       color: "text-green-600",
       bg: "bg-green-50",
       description: "Approve or deny user loan applications"
+    },
+    {
+      title: "Handle Fixed Requests",
+      path: "/admin/handle-fixed-request",
+      icon: <HandCoins size={32} />,
+      color: "text-yellow-600",
+      bg: "bg-yellow-50",
+      description: "Approve or deny user fixed deposit applications"
     }
   ];
 

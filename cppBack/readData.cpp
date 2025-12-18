@@ -125,31 +125,100 @@ void readAllLoansFromDatabase() {
 
 
 
-
-
-
-
-void readAllBranchesFromDatabase() {
+void readAllFixedFromDatabase() {
     MYSQL_ROW row;
     MYSQL_RES* res;
 
-    int qstate = mysql_query(conn, "SELECT id, branch_name, location_link, phone, address FROM branches");
-    if (!qstate) {
+    int qstate = mysql_query(conn, "SELECT id, email, status, duration, amount, profit , fixed_date FROM Fixed");
+    
+    if (!qstate) { // 0 means query successful
         res = mysql_store_result(conn);
         while ((row = mysql_fetch_row(res))) {
-            int id = row[0] ? stoi(row[0]) : 0;
-            string name = row[1] ? row[1] : "";
-            string loc = row[2] ? row[2] : "";
-            string phone = row[3] ? row[3] : "";
-            string addr = row[4] ? row[4] : "";
-            branchList.insert(id, name, loc, phone, addr);
+            int id = stoi(row[0]);            
+            string email = row[1];            
+            int status = stoi(row[2]);           
+            string duration = row[3];         
+            long long int amount = stoll(row[4]);        
+            long long int profit = stoll(row[5]);  
+            string date = row[6];
+            
+
+            FixedSSL.insertAtL(id, email, duration, amount, profit, date, status);
+            if(status == 2){
+            FixedQ.insert(id, email, duration, amount, profit, date, status);
+            }
+            
         }
         mysql_free_result(res);
-        cout << "Branches loaded successfully!" << endl;
+        cout << "Fixed deposits loaded successfully!" << endl;
+    }
+    else {
+        cout << "Fixed Execution Problem! " << mysql_error(conn) << endl;
+    }
+}
+
+
+
+
+
+
+// void readAllBranchesFromDatabase() {
+//     MYSQL_ROW row;
+//     MYSQL_RES* res;
+
+//     int qstate = mysql_query(conn, "SELECT id, branch_name, location_link, phone, address FROM branches");
+//     if (!qstate) {
+//         res = mysql_store_result(conn);
+//         while ((row = mysql_fetch_row(res))) {
+//             int id = row[0] ? stoi(row[0]) : 0;
+//             string name = row[1] ? row[1] : "";
+//             string loc = row[2] ? row[2] : "";
+//             string phone = row[3] ? row[3] : "";
+//             string addr = row[4] ? row[4] : "";
+//             branchList.insert(id, name, loc, phone, addr);
+//         }
+//         mysql_free_result(res);
+//         cout << "Branches loaded successfully!" << endl;
 
 
        
-    } else {
-        cout << "Query Execution Problem! " << mysql_error(conn) << endl;
+//     } else {
+//         cout << "Query Execution Problem! " << mysql_error(conn) << endl;
+//     }
+// }
+
+
+
+
+
+void readAllBranchesForUser()
+{
+    MYSQL_ROW row;
+    MYSQL_RES* res;
+
+    int qstate = mysql_query(conn,
+        "SELECT id, branch_name, location_link, phone, address, created_at "
+        "FROM branches");
+
+    if (!qstate)
+    {
+        res = mysql_store_result(conn);
+
+        while ((row = mysql_fetch_row(res)))
+        {
+            branchList.insert(
+                stoi(row[0]),   // id
+                row[1],         // branch_name
+                row[2],         // location_link
+                row[3],         // phone
+                row[4]         // address
+            );
+        }
+        mysql_free_result(res);
+        cout<<"Branches user loaded successfully!"<<endl;
+    }
+    else
+    {
+        cout << "Read branches error: " << mysql_error(conn) << endl;
     }
 }

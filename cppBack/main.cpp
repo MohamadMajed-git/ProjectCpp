@@ -19,7 +19,9 @@
 // AHMED------------------
 #include "Classes/Branch.hpp" 
 
-
+// abdelsalam----------------
+#include "Classes/FixedSSl.hpp"
+#include "Classes/FQue.hpp"
 
 using namespace std;
 //mohammad
@@ -32,6 +34,9 @@ StackPassword stackPassword;
 LoanSLL LoanSSL;
 LoanQueue LoanQ;
 
+//Abdelsalam
+FixedSLL FixedSSL;
+FixedQueue FixedQ;
 
 //AHMED 
 BranchList branchList;
@@ -42,11 +47,14 @@ int main()
     connectToDatabase();
     readAllDataFromDatabase();
     readAllLoansFromDatabase();
-    readAllBranchesFromDatabase();
+    // readAllBranchesFromDatabase();
+    readAllFixedFromDatabase();
+    readAllBranchesForUser();
     crow::SimpleApp app; 
-    setupRoutes(app);
+    setupRoutes(app); 
     setupLoanRoutes(app);
     setupBranchRoutes(app);
+    setupFixedRoutes(app);
 
 
 
