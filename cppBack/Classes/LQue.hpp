@@ -34,6 +34,7 @@ class LoanQueue {
     crow::json::wvalue getAllLoansJSON();
     void deleteNodeById(int id);
     void remove();
+    int getTotalLoanRequest();
     bool isEmpty();
     void display();
 };

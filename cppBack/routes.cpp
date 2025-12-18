@@ -58,7 +58,8 @@ void setupRoutes(crow::SimpleApp &app)
                                                               data.has("accountType") ? (string)data["accountType"].s() : string(""),
                                                               createAt,
                                                               balance,
-                                                              accountNumber
+                                                              accountNumber,
+                                                              "hold"
                                                             );
                                                             string tokenQuery="UPDATE users SET token = '" + token + "' WHERE email = '" + email + "'";
                                                             if(mysql_query(conn,tokenQuery.c_str())==0){
@@ -229,10 +230,23 @@ void setupRoutes(crow::SimpleApp &app)
     ([](const request &req){
         if (req.method == "OPTIONS"_method) return crow::response(200);
         json::rvalue data=json::load(req.body);
+        
         if(!data)return response(400,"Invalid JSON");
         string senderAccountNumber=data.has("senderAccountNumber")?(string)data["senderAccountNumber"].s():(string)"";
         int amount=data.has("amount")?stoi((string)data["amount"].s()):0;
         string receiverAccountNumber=data.has("receiverAccountNumber")?(string)data["receiverAccountNumber"].s():(string)"";
+        if(userList.isActive(senderAccountNumber)==false){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "sender account is not active";
+            return crow::response(400, response);
+        }
+        if(userList.isActive(receiverAccountNumber)==false){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "receiver account is not active";
+            return crow::response(400, response);
+        }
         bool status=userList.sendMoney(senderAccountNumber, receiverAccountNumber, amount);
         if(status==false){
             json::wvalue response;
@@ -489,7 +503,26 @@ void setupRoutes(crow::SimpleApp &app)
 
 
 
-
+        CROW_ROUTE(app,"/api/adman-home-data")
+        .methods("POST"_method)([](const request &req){
+            json::rvalue data=json::load(req.body);
+            if(!data)return response(400,"Invalid JSON");
+            string email=data.has("email")?(string)data["email"].s():(string)"";
+            bool isAdmin = userList.checkIfAdmin(email);
+            if(isAdmin==false){
+                json::wvalue response;
+                response["status"] = "error";
+                response["message"] = "Unauthorized";
+                return crow::response(401, response);
+            }
+            json::wvalue response;
+            response["status"] = "success";
+            response["userCount"] = userList.getUserCount();
+            response["totalBalance"] = userList.getTotalBalance();
+            response["totalLoanRequest"] = LoanQ.getTotalLoanRequest();
+            return crow::response(200, response);
+            
+        });
         
         
         
@@ -518,6 +551,11 @@ void setupLoanRoutes(crow::SimpleApp &app) {
             if(!data)return response(400,"Invalid JSON");
             string email=data.has("email")?(string)data["email"].s():(string)"";
             string duration=data.has("duration")?(string)data["duration"].s():(string)"";
+            if(userList.isActiveByEmail(email)==false){
+                json::wvalue err;
+                err["message"]="your account is not active";
+                return crow::response(400,err);
+            }
             int money=data.has("moneyOfLoan")?(int)data["moneyOfLoan"]:0;
             if(!userList.checkIfUserExist(email)){
                 cout<<1;

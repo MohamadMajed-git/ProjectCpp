@@ -9,7 +9,7 @@ void readAllDataFromDatabase(){
     MYSQL_ROW row;
     MYSQL_RES* res;
     int balance=0;
-    int qstate=mysql_query(conn,"SELECT fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt,balance,accountNumber FROM users");
+    int qstate=mysql_query(conn,"SELECT fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt,balance,accountNumber,status FROM users");
     if(!qstate){// all team member qstate will return 0 if the query is successful
         res=mysql_store_result(conn);
         while((row=mysql_fetch_row(res))){
@@ -27,9 +27,12 @@ void readAllDataFromDatabase(){
                 row[9],
                 row[10],
                 balance,
-                row[12]
+                row[12],
+                row[13]
             );
+          
         }
+        
         mysql_free_result(res);
     }
     else{
@@ -52,6 +55,7 @@ void readAllDataFromDatabase(){
         cout<<"Query activateAccounts  Execution Problem!2"<< mysql_error(conn) << endl;
     }
     qstate=mysql_query(conn,"SELECT id, senderAccount, receiverAccount, amount, date FROM transactions");
+    int totalBalance=0;
     if(!qstate){
         res=mysql_store_result(conn);
         while((row=mysql_fetch_row(res))){
@@ -62,7 +66,9 @@ void readAllDataFromDatabase(){
                 stoi(row[3]),
                 row[4]
             );
+            totalBalance+=stoi(row[3]);
         }
+        userList.setTotalBalance(totalBalance);
         mysql_free_result(res);
     }
     else{

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,int balance,string accountNumber)
+string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,int balance,string accountNumber,string status="hold")
 {
     Node *newNode = new Node();
     newNode->name1 = name1;
@@ -21,10 +21,11 @@ string SLL::insertAtB(string name1, string name2, string nationalID, string birt
     newNode->job = job;
     newNode->accountType = accountType;
     newNode->balance = balance;
-    newNode->status ="hold";
+    newNode->status = status;
     newNode->createAt = currentDate;
     newNode->accountNumber=accountNumber;
     newNode->token = generateToken();
+    count++;
 
     if (head == nullptr)
     {
@@ -100,6 +101,7 @@ void SLL::deleteNodeByEmail(string email) {
                 tail = prev;
             }
             delete cur;
+            count--;
             return;
         }
         prev = cur;
@@ -177,6 +179,8 @@ crow::json::wvalue SLL::getDataByEmail(string email){
             userData["email"]=cur->email;
             userData["balance"]=cur->balance;
             userData["accountNumber"]=cur->accountNumber;
+            userData["accountType"]=cur->accountType;
+            userData["status"]=cur->status;
             return userData;
             }
             cur=cur->next;
@@ -208,6 +212,7 @@ bool SLL::sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,int 
     }
     senderNode->balance-=amount;
     receiverNode->balance+=amount;
+    senderBalance+=amount;
     return true;
 }
 
@@ -260,6 +265,49 @@ bool SLL::checkPassword(string email, string password){
     while(cur!=nullptr){
         if(cur->email==email){
             if(cur->password==password){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        cur=cur->next;
+    }
+    return false;
+}
+
+
+int SLL::getTotalBalance(){
+    return senderBalance;
+}
+int SLL::getUserCount(){
+    return count;
+}
+void SLL::setTotalBalance(int balance){
+    senderBalance=balance;
+}
+
+
+bool SLL::isActive(string accountNumber){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->accountNumber==accountNumber){
+            if(cur->status=="active"){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        cur=cur->next;
+    }
+    return false;
+}
+bool SLL::isActiveByEmail(string email){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            if(cur->status=="active"){
                 return true;
             }
             else{

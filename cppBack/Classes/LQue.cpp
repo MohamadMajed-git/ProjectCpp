@@ -166,3 +166,8 @@ crow::json::wvalue LoanQueue::getAllLoansJSON() {
 
     return crow::json::wvalue(loansList);
 }
+
+
+int LoanQueue::getTotalLoanRequest() {
+    return len;
+}
