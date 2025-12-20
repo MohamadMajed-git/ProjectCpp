@@ -51,6 +51,7 @@ class SLL{
     void updatePassword(string email, string newPassword);
     int getTotalBalance();
     int getUserCount();
+    
     void setTotalBalance(int balance);
     bool isActive(string accountNumber);
     bool isActiveByEmail(string email);

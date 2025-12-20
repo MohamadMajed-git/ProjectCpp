@@ -15,10 +15,11 @@ export default function ABranches() {
     phone: "",
     address: "",
   });
-
+  console.log("Current Branch:", currentBranch);
   const loadBranches = async () => {
     try {
       const res = await axiosClient.get("/admin/branches");
+
 
       setBranches(res.data==null ? [] : res.data);
     } catch (err) {
@@ -59,10 +60,24 @@ export default function ABranches() {
     e.preventDefault();
     try {
       if (isEdit) {
-        await axiosClient.put(`/branches/${currentBranch.id}`, currentBranch);
+     
+  await axiosClient.put("/admin/branches", {
+  id: currentBranch.id,
+  name: currentBranch.branch_name,
+  location_link: currentBranch.location_link,
+  phone: currentBranch.phone,
+  address: currentBranch.address,
+});
 
       } else {
-        await axiosClient.post("/branches", currentBranch);
+       await axiosClient.post("/admin/branches", {
+       name: currentBranch.branch_name,
+       location_link: currentBranch.location_link,
+       phone: currentBranch.phone,
+       address: currentBranch.address,
+});
+
+
 
       }
       setShowForm(false);
@@ -76,7 +91,9 @@ export default function ABranches() {
     if (!window.confirm("Are you sure you want to delete this branch?")) return;
 
     try {
-      await axiosClient.delete(`/branches/${id}`);
+     await axiosClient.delete("/admin/branches", {
+  data: { id },
+});
 
       loadBranches();
     } catch (err) {
@@ -129,7 +146,7 @@ export default function ABranches() {
             {filteredBranches.map((branch, i) => (
               <tr key={i} className="border-b hover:bg-blue-50">
                 <td className="p-3">{branch.id}</td>
-                <td className="p-3">{branch.branch_name}</td>
+                <td className="p-3">{branch.name}</td>
                 <td className="p-3">
                   <a
                     href={branch.location_link}
@@ -185,7 +202,7 @@ export default function ABranches() {
               name="branch_name"
               placeholder="Branch Name"
               className="w-full p-2 border rounded mb-3"
-              value={currentBranch.branch_name}
+              value={currentBranch.name}
               onChange={handleInput}
               required
             />
@@ -237,4 +254,4 @@ export default function ABranches() {
       )}
     </div>
   );
-}
+}   

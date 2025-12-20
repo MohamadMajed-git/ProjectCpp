@@ -219,7 +219,7 @@ void setupRoutes(crow::SimpleApp &app)
         
         if(!data)return response(400,"Invalid JSON");
         string senderAccountNumber=data.has("senderAccountNumber")?(string)data["senderAccountNumber"].s():(string)"";
-        int amount=data.has("amount")?stoi((string)data["amount"].s()):0;
+        long long int amount=data.has("amount")?stoi((string)data["amount"].s()):0;
         string receiverAccountNumber=data.has("receiverAccountNumber")?(string)data["receiverAccountNumber"].s():(string)"";
         if(userList.isActive(senderAccountNumber)==false){
             json::wvalue response;
@@ -550,12 +550,44 @@ void setupLoanRoutes(crow::SimpleApp &app)
     }
     string email = data1[0];
     string money = data1[1];
+    json::wvalue account_B =userList.getDataByEmail(email);
+    string temp=account_B.dump();
+    json::rvalue account = json::load(temp);
+    string accountNo = account.has("accountNumber") ? (string)account["accountNumber"].s() : (string)"";
+
+            string query = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('BANK', '" + accountNo + "', " + money + ", '" + currentDate() + "')";
+        if(mysql_query(conn, query.c_str()) != 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        query = "SELECT id FROM transactions WHERE senderAccount = 'BANK' AND receiverAccount = '" + accountNo + "' AND amount = " + money + " ORDER BY id DESC LIMIT 1";
+        if(mysql_query(conn, query.c_str())!= 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+            
+        MYSQL_RES* res = mysql_store_result(conn);
+        MYSQL_ROW row = mysql_fetch_row(res);
+        int transactionId = stoi(row[0]);
+        transactionList.insertTransaction(transactionId, "BANK", accountNo, stoi(money), currentDate());
+        mysql_free_result(res);
 
     long long int moneyInt = stoi(money);
-    string query = "UPDATE loans SET states = 1 WHERE id = " + to_string(id);
+    query = "UPDATE loans SET states = 1 WHERE id = " + to_string(id);
     string query2 = "UPDATE users SET balance = balance + " + to_string(moneyInt) +" WHERE email = '" + email + "'";
 
     if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){   
+    
     LoanQ.changestates(id, 1); // approveds
     LoanSSL.changestates(id, 1); // approveds
     LoanQ.remove();
@@ -664,9 +696,41 @@ void setupFixedRoutes(crow::SimpleApp &app)
     }
     string email = data1[0];
     string amount = data1[1];
+        json::wvalue account_B =userList.getDataByEmail(email);
+    string temp=account_B.dump();
+    json::rvalue account = json::load(temp);
+    string accountNo = account.has("accountNumber") ? (string)account["accountNumber"].s() : (string)"";
+
+           string  query = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('BANK', '" + accountNo + "', " + amount + ", '" + currentDate() + "')";
+
+        if(mysql_query(conn, query.c_str()) != 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+                query = "SELECT id FROM transactions WHERE senderAccount = 'BANK' AND receiverAccount = '" + accountNo + "' AND amount = " + amount + " ORDER BY id DESC LIMIT 1";
+        if(mysql_query(conn, query.c_str())!= 0)
+        {
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+            
+        MYSQL_RES* res = mysql_store_result(conn);
+        MYSQL_ROW row = mysql_fetch_row(res);
+        int transactionId = stoi(row[0]);
+        transactionList.insertTransaction(transactionId, "BANK", accountNo, stoi(amount), currentDate());
+        mysql_free_result(res);
 
     long long amountInt = stoll(amount);
-    string query = "UPDATE Fixed SET status = 1 WHERE id = " + to_string(id);
+    query = "UPDATE Fixed SET status = 1 WHERE id = " + to_string(id);
     string query2 = "UPDATE users SET balance = balance - " + to_string(amountInt) + " WHERE email = '" + email + "'";
 
     if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){   
@@ -721,6 +785,7 @@ void setupFixedRoutes(crow::SimpleApp &app)
     return crow::response(200, FixedSSL.getFixedByEmailJSON(email)); });
 }
 //!-----------------------------------
+ 
 void setupBranchRoutes(crow::SimpleApp& app) {
 
    
@@ -740,12 +805,40 @@ void setupBranchRoutes(crow::SimpleApp& app) {
 
         if (req.method == "POST"_method)
         {
+            string query = "INSERT INTO branches ( branch_name, location_link, phone, address) VALUES ('" +
+                           (string)body["name"].s() + "', '" +
+                           (string)body["location_link"].s() + "', '" +
+                           (string)body["phone"].s() + "', '" +
+                           (string)body["address"].s() + "')";
+            if (mysql_query(conn, query.c_str()) != 0)
+            {
+                string errorMsg = mysql_error(conn);
+                cout << "MySQL Query Error: " << errorMsg << endl;
+                crow::json::wvalue response;
+                response["status"] = "error";
+                response["message"] = "somthing went wrong" + errorMsg;
+                return crow::response(400, response);
+            }
+            query="SELECT id FROM branches ORDER BY id DESC LIMIT 1";
+        if(mysql_query(conn,query.c_str())!= 0){
+            string errorMsg = mysql_error(conn);
+            cout << "MySQL Query Error: " << errorMsg << endl;
+            crow::json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "somthing went wrong" + errorMsg;
+            return crow::response(400, response);
+        }
+        MYSQL_RES* res = mysql_store_result(conn);
+        MYSQL_ROW row = mysql_fetch_row(res);
+        int branchId = stoi(row[0]);
+        mysql_free_result(res);
+            
             branchList.insert(
-                body["id"].i(),
-                body["name"].s(),
-                body["location_link"].s(),
-                body["phone"].s(),
-                body["address"].s()
+                branchId,
+                (string)body["name"].s(),
+                (string)body["location_link"].s(),
+                (string)body["phone"].s(),
+                (string)body["address"].s()
             );
             return crow::response(201, "Branch added");
         }
@@ -759,15 +852,15 @@ void setupBranchRoutes(crow::SimpleApp& app) {
 
             branchList.insert(
                 id,
-                body["name"].s(),
-                body["location_link"].s(),
-                body["phone"].s(),
-                body["address"].s()
+            (string)body["name"].s(),
+                (string)body["location_link"].s(),
+                (string)body["phone"].s(),
+                (string)body["address"].s()
             );
             return crow::response("Branch updated");
         }
 
-        
+       
         if (req.method == "DELETE"_method)
         {
             int id = body["id"].i();
@@ -796,5 +889,3 @@ void setupBranchRoutes(crow::SimpleApp& app) {
 
 
 }
-
-

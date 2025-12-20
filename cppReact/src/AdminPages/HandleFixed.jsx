@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { CheckCircle, XCircle, Clock, History, FileText } from 'lucide-react';
-
+import Swal from "sweetalert2";
 export default function HandleFixed() {
   const [fixeds, setFixeds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,14 +42,32 @@ export default function HandleFixed() {
   const handleApprove = (id) => {
     axiosClient.post("admin/approve-fixed", { id })
       .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Fixed Deposit Approved',
+          timer: 2000,
+          showConfirmButton: false,
+        });
         fetchFixeds();
         fetchHistory();
+      }).catch(()=>{
+        Swal.fire({
+          icon: 'error',
+          title: 'Error approving fixed deposit',
+          timer: 2000,
+          showConfirmButton: false,
+        });
       });
   };
 
   const handleDeny = (id) => {
     axiosClient.post("admin/deny-fixed", { id })
       .then(() => {
+        Swal.fire({
+          icon: 'failure',
+          title: 'Fixed Deposit Denied',
+          showConfirmButton: true,
+        });
         fetchFixeds();
         fetchHistory();
       });
