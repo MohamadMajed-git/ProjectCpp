@@ -142,6 +142,29 @@ void setupRoutes(crow::SimpleApp &app)
             return crow::response(401,response);
         } });
 
+
+        CROW_ROUTE(app, "/api/get-users")
+        .methods("POST"_method, "OPTIONS"_method)([](const request &req)
+                                                  {
+                                                      if (req.method == "OPTIONS"_method)
+                                                          return crow::response(200);
+
+                                                      json::rvalue data = json::load(req.body);
+                                                      if (!data)
+                                                          return crow::response(400, "Invalid JSON");
+
+                                                      string email = data.has("email") ? (string)data["email"].s() : (string) "";
+                                                      if(userList.checkIfAdmin(email)==false){
+                                                          json::wvalue response;
+                                                          response["status"]="error";
+                                                          response["message"]="Unauthorized";
+                                                          return crow::response(401,response);
+                                                      }
+                                                      crow::json::wvalue response;
+                                                      response["users"] = userList.getAllData();
+                                                      return crow::response(200, response);
+                                                  });
+
     CROW_ROUTE(app, "/api/holded-accounts")
         .methods("GET"_method, "OPTIONS"_method)([](const request &req)
                                                  {
@@ -579,7 +602,6 @@ void setupLoanRoutes(crow::SimpleApp &app)
         MYSQL_RES* res = mysql_store_result(conn);
         MYSQL_ROW row = mysql_fetch_row(res);
         int transactionId = stoi(row[0]);
-        transactionList.insertTransaction(transactionId, "BANK", accountNo, stoi(money), currentDate());
         mysql_free_result(res);
 
     long long int moneyInt = stoi(money);
@@ -587,7 +609,8 @@ void setupLoanRoutes(crow::SimpleApp &app)
     string query2 = "UPDATE users SET balance = balance + " + to_string(moneyInt) +" WHERE email = '" + email + "'";
 
     if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){   
-    
+    transactionList.insertTransaction(transactionId, "BANK", accountNo, stoi(money), currentDate());  
+    userList.sendMoney("BANK", accountNo, stoi(money));  
     LoanQ.changestates(id, 1); // approveds
     LoanSSL.changestates(id, 1); // approveds
     LoanQ.remove();
@@ -726,19 +749,27 @@ void setupFixedRoutes(crow::SimpleApp &app)
         MYSQL_RES* res = mysql_store_result(conn);
         MYSQL_ROW row = mysql_fetch_row(res);
         int transactionId = stoi(row[0]);
-        transactionList.insertTransaction(transactionId, "BANK", accountNo, stoi(amount), currentDate());
         mysql_free_result(res);
 
     long long amountInt = stoll(amount);
+    
     query = "UPDATE Fixed SET status = 1 WHERE id = " + to_string(id);
     string query2 = "UPDATE users SET balance = balance - " + to_string(amountInt) + " WHERE email = '" + email + "'";
-
-    if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){   
+        if(!userList.sendMoney(accountNo, "BANK", stoi(amount))){
+            json::wvalue response;
+            response["status"] = "error";
+            response["message"] = "Transaction failed .....YOU DON'T HAVE ENOUGH BALANCE";
+            return crow::response(400, response);
+        }           
+        
+    if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){               
+    transactionList.insertTransaction(transactionId,  accountNo,"BANK", stoi(amount), currentDate());
     FixedQ.changestatus(id, 1); // approveds
     FixedSSL.changeStatusByid(id, 1); // approveds
     FixedQ.remove();
 
         return crow::response(200, "State updated");
+        
         }
         else{
                 json::wvalue err;
@@ -875,7 +906,6 @@ void setupBranchRoutes(crow::SimpleApp& app) {
     });
 
 
-     // GET كل الفروع للمستخدم
     CROW_ROUTE(app, "/api/user/branches").methods("GET"_method)
     ([&](){
         crow::json::wvalue result;
@@ -889,3 +919,9 @@ void setupBranchRoutes(crow::SimpleApp& app) {
 
 
 }
+
+
+
+
+
+

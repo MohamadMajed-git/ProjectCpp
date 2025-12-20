@@ -20,8 +20,9 @@ export default function HandleFixed() {
 
   const getStatusStyle = (status) => {
     const s = getStateText(status).toLowerCase();
-    if (s.includes('accept') || s.includes('approv')) return "bg-green-100 text-green-700 border-green-200";
+    if (s.includes('accept') || s.includes('approved')) return "bg-green-100 text-green-700 border-green-200";
     if (s.includes('deny') || s.includes('denied')) return "bg-red-100 text-red-700 border-red-200";
+    if (s.includes('finish') || s.includes('finished')) return "bg-blue-100 text-blue-700 border-blue-200";
     return "bg-yellow-100 text-yellow-700 border-yellow-200";
   };
 
@@ -78,14 +79,12 @@ export default function HandleFixed() {
     fetchHistory();
   }, []);
 
-  // Find index of first pending fixed deposit
   const firstPendingIndex = fixeds.findIndex(f => f.status === 2);
 
   return (
     <div className="p-6 md:p-10 bg-gray-50/50 min-h-screen">
       <div className="max-w-6xl mx-auto space-y-6">
 
-        {/* Header & Tabs */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Fixed Deposits Management</h1>
@@ -118,7 +117,7 @@ export default function HandleFixed() {
           </div>
         </div>
 
-        {/* Main Content */}
+        {}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
             <div className="p-12 text-center flex flex-col items-center justify-center text-gray-500">
@@ -128,7 +127,7 @@ export default function HandleFixed() {
           ) : (
             <div className="overflow-x-auto">
 
-              {/* Requests Table */}
+              {}
               {tab === "requests" && (
                 <>
                   {fixeds.length === 0 ? (
@@ -205,7 +204,7 @@ export default function HandleFixed() {
                 </>
               )}
 
-              {/* History Table */}
+              {}
               {tab === "history" && (
                 <>
                   {history.length === 0 ? (

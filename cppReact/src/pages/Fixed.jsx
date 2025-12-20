@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../context/ContextProvider";
-import {HandCoins,History,Calendar,DollarSign,FileText,Search,} from "lucide-react";
+import {
+  HandCoins,
+  History,
+  Calendar,
+  DollarSign,
+  FileText,
+  Search,
+} from "lucide-react";
 
-/* ===== Profit Rates ===== */
 const PROFIT_RATES = {
   "3 months": 0.05,
   "6 months": 0.08,
@@ -19,11 +25,9 @@ export default function Loan() {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /* ===== Calculations ===== */
   const profitRate = PROFIT_RATES[duration];
   const profit = amount ? amount * profitRate : 0;
 
-  /* ===== Status Text ===== */
   const getStateText = (state) => {
     switch (state) {
       case 0: return "Finished";
@@ -42,16 +46,23 @@ export default function Loan() {
       return "bg-green-100 text-green-800 border-green-200";
     if (status.includes("denied"))
       return "bg-red-100 text-red-800 border-red-200";
+        if (status.includes("finished"))
+      return "bg-blue-100 text-blue-800 border-blue-200";
     return "bg-gray-100 text-gray-800 border-gray-200";
   };
 
-  /* ===== Submit Fixed Request ===== */
   const handleSubmit = () => {
-    if (!amount || amount <= 0) return;
+    const numericAmount = Number(amount);
+
+ 
+    if (!numericAmount || numericAmount < 1000) {
+      alert("Minimum fixed deposit amount is 1000");
+      return;
+    }
 
     axiosClient
       .post("submit-fixed-request", {
-        amount: Number(amount),
+        amount: numericAmount,
         profit: Number(profit.toFixed(2)),
         duration,
         email: user.email,
@@ -59,13 +70,12 @@ export default function Loan() {
       .then(() => fetchHistory());
   };
 
-  /* ===== Fetch History ===== */
   const fetchHistory = () => {
     setLoading(true);
     axiosClient
-      .post(`client/get-fixed-history`, {"email": user.email})
+      .post(`client/get-fixed-history`, { email: user.email })
       .then((res) => setLoans(res.data || []))
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -75,7 +85,6 @@ export default function Loan() {
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-10 space-y-8">
 
-      {/* ===== Apply Fixed Deposit ===== */}
       <div className="max-w-5xl mx-auto bg-white rounded-2xl border shadow-sm">
         <div className="bg-indigo-600 p-6 flex gap-3 text-white">
           <HandCoins />
@@ -91,7 +100,6 @@ export default function Loan() {
 
           <div className="grid md:grid-cols-3 gap-4 items-end">
 
-            {/* Amount */}
             <div>
               <label className="text-sm font-semibold">Amount</label>
               <div className="relative">
@@ -101,12 +109,11 @@ export default function Loan() {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className="w-full pl-10 py-2.5 border rounded-xl"
-                  placeholder="Enter amount"
+                  placeholder="Minimum 1000"
                 />
               </div>
             </div>
 
-            {/* Duration */}
             <div>
               <label className="text-sm font-semibold">Duration</label>
               <div className="relative">
@@ -123,7 +130,6 @@ export default function Loan() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               onClick={handleSubmit}
               className="bg-indigo-600 text-white py-2.5 rounded-xl hover:bg-indigo-700 flex justify-center gap-2"
@@ -134,7 +140,6 @@ export default function Loan() {
 
           </div>
 
-          {/* ===== Profit Preview ===== */}
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-gray-50 p-4 rounded-xl border">
               <p className="text-sm text-gray-500">Profit Rate</p>
@@ -161,7 +166,6 @@ export default function Loan() {
         </div>
       </div>
 
-      {/* ===== History ===== */}
       <div className="max-w-5xl mx-auto">
         <h2 className="text-2xl font-bold mb-4 flex gap-2">
           <History /> My Deposits

@@ -44,6 +44,7 @@ class SLL{
     string generateRandomInteger(int length);
     void insertToken(string email);
     crow::json::wvalue getDataByEmail(string email);
+    crow::json::wvalue getAllData();
     string createAccountNumber(string accountType);
     bool checkIfUserExist(string email);
     bool checkPassword(string email, string password);
@@ -51,7 +52,6 @@ class SLL{
     void updatePassword(string email, string newPassword);
     int getTotalBalance();
     int getUserCount();
-    
     void setTotalBalance(int balance);
     bool isActive(string accountNumber);
     bool isActiveByEmail(string email);

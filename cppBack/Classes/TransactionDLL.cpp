@@ -27,7 +27,6 @@ void TransactionDLL::insertTransaction(int id, string senderAccountNumber,string
 
 crow::json::wvalue TransactionDLL::getUserTransactions(string accountNumber)
 {
-    json::wvalue transactions;
     TransactionNode* cur = head;
     vector<json::wvalue> userTransactions;
     while (cur != nullptr)

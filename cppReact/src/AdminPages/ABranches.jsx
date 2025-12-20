@@ -111,7 +111,7 @@ export default function ABranches() {
         Admin Panel - Bank Branches
       </h1>
 
-      {/* Top Controls */}
+      {}
       <div className="flex justify-between mb-5">
         <input
           type="number"
@@ -129,7 +129,7 @@ export default function ABranches() {
         </button>
       </div>
 
-      {/* Branches Table */}
+      {}
       <div className="overflow-x-auto shadow-lg rounded-lg border">
         <table className="w-full text-center bg-white">
           <thead className="bg-blue-700 text-white">
@@ -186,7 +186,7 @@ export default function ABranches() {
         </table>
       </div>
 
-      {/* Modal Form */}
+      {}
       {showForm && (
         <div className="fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center">
           <form

@@ -173,7 +173,7 @@ return (
                     <Wallet size={64} className="text-green-600" />
                   </div>
                   <p className="text-sm font-bold text-green-600 mb-2 uppercase tracking-wide">Current Balance</p>
-                  <p className="text-4xl md:text-5xl font-extrabold text-gray-800 tracking-tight">
+                  <p className={` font-extrabold text-gray-800 tracking-tight ${userData?.balance >= 10000000 ? "text-2xl md:text-4xl" : "text-4xl md:text-5xl"}`}>
                     {moneyFormatter(userData?.balance || 0)}
                   </p>
                </div>

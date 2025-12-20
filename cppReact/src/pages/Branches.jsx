@@ -9,7 +9,7 @@ export default function Branches() {
 
   const loadBranches = async () => {
     try {
-      const res = await axiosClient.get("/user/branches"); // API لليوزر
+      const res = await axiosClient.get("/user/branches");
       setBranches(res.data == null ? [] : res.data);
     } catch (err) {
       console.error(err);
@@ -29,7 +29,6 @@ export default function Branches() {
 
      
 
-      {/* عرض الفروع */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {branches.map((branch) => (
           <div

@@ -21,8 +21,9 @@ export default function HandleLoans() {
 
   const getStatusStyle = (status) => {
     const s = getStateText(status).toLowerCase();
-    if (s.includes('accept') || s.includes('approv')) return "bg-green-100 text-green-700 border-green-200";
-    if (s.includes('deny') || s.includes('reject')) return "bg-red-100 text-red-700 border-red-200";
+    if (s.includes('accept') || s.includes('approved')) return "bg-green-100 text-green-700 border-green-200";
+    if (s.includes('deny') || s.includes('denied')) return "bg-red-100 text-red-700 border-red-200";
+    if (s.includes('finish') || s.includes('finished')) return "bg-blue-100 text-blue-700 border-blue-200";
     return "bg-yellow-100 text-yellow-700 border-yellow-200";
   };
 
@@ -97,14 +98,14 @@ export default function HandleLoans() {
       
       <div className="max-w-6xl mx-auto space-y-6">
         
-        {/* العنوان والتبويبات */}
+        {}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Loan Management</h1>
             <p className="text-gray-500 text-sm">Review requests and view history.</p>
           </div>
 
-          {/* تصميم التبويبات الحديث */}
+          {}
           <div className="bg-white p-1 rounded-xl border border-gray-200 flex items-center shadow-sm">
             <button 
               onClick={() => setTab("requests")}
@@ -117,7 +118,7 @@ export default function HandleLoans() {
             >
               <Clock size={16} />
               Pending Requests
-              {/* Badge للعدد (اختياري) */}
+              {}
               {loans.length > 0 && tab !== "requests" && (
                 <span className="bg-blue-100 text-blue-600 text-xs py-0.5 px-1.5 rounded-full ml-1">{loans.length}</span>
               )}
@@ -137,8 +138,7 @@ export default function HandleLoans() {
             </button>
           </div>
         </div>
-
-        {/* المحتوى الرئيسي */}
+  
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           
           {loading ? (
@@ -149,7 +149,6 @@ export default function HandleLoans() {
           ) : (
             <div className="overflow-x-auto">
               
-              {/* --- جدول الطلبات (Requests) --- */}
               {tab === "requests" && (
                 <>
                   {loans.length === 0 ? (
@@ -171,7 +170,9 @@ export default function HandleLoans() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 text-sm">
-                        {loans.map((loan) => (
+                        {loans.map((loan) => {
+                          const isFrist = loans.indexOf(loan) === 0;
+                          return(
                           <tr key={loan.id} className="hover:bg-gray-50 transition-colors group">
                             <td className="p-4 font-mono text-gray-500">#{loan.id}</td>
                             <td className="p-4 font-medium text-gray-800">{loan.email}</td>
@@ -186,28 +187,30 @@ export default function HandleLoans() {
                             <td className="p-4 flex justify-end gap-2">
                               <button 
                                 onClick={() => handleApprove(loan.id)}
-                                className="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-colors text-xs font-bold"
+                                className={`flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-colors text-xs font-bold ${isFrist ? '' : 'opacity-50 cursor-not-allowed'}`}
                                 title="Approve Loan"
+                                disabled={isFrist ? false : true}
                               >
                                 <CheckCircle size={14} /> Approve
                               </button>
                               <button 
                                 onClick={() => handleDeny(loan.id)}
-                                className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors text-xs font-bold"
+                                className={`flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors text-xs font-bold ${isFrist ? '' : 'opacity-50 cursor-not-allowed'}`}
                                 title="Deny Loan"
+                                disabled={isFrist ? false : true}
                               >
                                 <XCircle size={14} /> Deny
                               </button>
                             </td>
                           </tr>
-                        ))}
+                        )})}
                       </tbody>
                     </table>
                   )}
                 </>
               )}
 
-              {/* --- جدول السجل (History) --- */}
+              {}
               {tab === "history" && (
                 <>
                   {history.length === 0 ? (

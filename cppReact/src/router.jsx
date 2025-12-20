@@ -19,6 +19,7 @@ import PasswordChangeRequests from "./AdminPages/PasswordChangeRequests";
 import HandleLoans from "./AdminPages/HandleLoan";
 import Fixed from "./pages/Fixed";
 import HandleFixed from "./AdminPages/HandleFixed";
+import AllUsers from "./AdminPages/AllUsers";
 const router = createBrowserRouter([
 
     {
@@ -98,6 +99,10 @@ const router = createBrowserRouter([
             }, {
                 path: "handle-fixed-request",
                 element: <HandleFixed />
+            },
+            {
+                path: "all-users-data",
+                element: <AllUsers />
             }
 
         ]

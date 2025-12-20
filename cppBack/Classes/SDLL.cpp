@@ -287,6 +287,25 @@ void SLL::setTotalBalance(int balance){
     senderBalance=balance;
 }
 
+crow::json::wvalue SLL::getAllData(){
+    Node* cur=head;
+    vector<crow::json::wvalue> usersList;
+    while(cur!=nullptr){
+        crow::json::wvalue userData;
+        userData["name1"]=cur->name1;
+        userData["name2"]=cur->name2;
+        userData["nationalID"]=cur->nationalID;
+        userData["email"]=cur->email;
+        userData["balance"]=cur->balance;
+        userData["accountNumber"]=cur->accountNumber;
+        userData["accountType"]=cur->accountType;
+        userData["status"]=cur->status;
+        usersList.push_back(move(userData));
+        cur=cur->next;
+ 
+    }
+    return crow::json::wvalue(usersList);
+}
 
 bool SLL::isActive(string accountNumber){
     Node* cur=head;
