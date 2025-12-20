@@ -5,7 +5,7 @@
 using namespace std;
 using namespace crow;
 
-void TransactionDLL::insertTransaction(int id, string senderAccountNumber,string receiverAccountNumber,int amount,string date)
+void TransactionDLL::insertTransaction(int id, string senderAccountNumber,string receiverAccountNumber,long long int amount,string date)
 {
     TransactionNode *newNode = new TransactionNode();
     newNode->id = id;

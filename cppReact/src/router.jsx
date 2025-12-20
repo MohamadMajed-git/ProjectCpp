@@ -18,7 +18,7 @@ import ChangePassword from "./pages/ChangePassword";
 import PasswordChangeRequests from "./AdminPages/PasswordChangeRequests";
 import HandleLoans from "./AdminPages/HandleLoan";
 import Fixed from "./pages/Fixed";
-import HandleFixed from "../../../../Downloads/ProjectCpp-main (2)/ProjectCpp-main (2)/ProjectCpp-main/cppReact/src/AdminPages/HandleFixed";
+import HandleFixed from "./AdminPages/HandleFixed";
 const router = createBrowserRouter([
 
     {

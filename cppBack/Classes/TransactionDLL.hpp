@@ -10,7 +10,7 @@ class TransactionDLL{
         int id;
         string senderAccountNumber;
         string receiverAccountNumber;
-        int amount;
+        long long int amount;
         string date;
         TransactionNode *next=nullptr;
     };
@@ -23,7 +23,7 @@ class TransactionDLL{
         tail=nullptr;
         size=0;
     }
-    void insertTransaction(int id, string senderAccountNumber,string receiverAccountNumber,int amount,string date);
+    void insertTransaction(int id, string senderAccountNumber,string receiverAccountNumber,long long amount,string date);
     crow::json::wvalue getUserTransactions(string accountNumber);
     crow::json::wvalue getAllTransactions();
     crow::json::wvalue getTransactionById(int id);
