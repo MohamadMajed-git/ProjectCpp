@@ -94,6 +94,7 @@ void SLL::deleteNodeByEmail(string email) {
         if (cur->email == email) {
             if (cur == head) {
                 head = cur->next;
+                
             } else {
                 prev->next = cur->next;
             }
@@ -131,6 +132,7 @@ SLL::Node* SLL::getNodeByEmail(string email)
 
 string SLL::generateToken()
 {
+    //! ref :https://stackoverflow.com/questions/19665818/generate-random-numbers-using-c11-random-library
     static random_device rd;
     static mt19937 gen(rd());
     static uniform_int_distribution<> dis(0,25);
