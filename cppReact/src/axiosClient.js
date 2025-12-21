@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const axiosClient = axios.create({
-    baseURL: "/api",
+    baseURL: "https://projectcpp123.onrender.com/api",
 });
 
 export default axiosClient;
