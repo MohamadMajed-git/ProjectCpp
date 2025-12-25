@@ -3,6 +3,7 @@
 #include <string>
 #include<crow.h>
 #include <vector>
+#include <ctime>
 using namespace std;
 
 
@@ -32,9 +33,10 @@ class LoanSLL {
     LoanNode* getNodeByEmail(string email);
     crow::json::wvalue getAllLoansJSON();
     crow::json::wvalue getLoansByEmailJSON(string email);
-    
+    void changeAmountLate(int id);
     void deleteNodeByEmail(string email);
     void changestates(int id, int newState);
     bool isEmpty();
     void display();
+    void checklate();
 };

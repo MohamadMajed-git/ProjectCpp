@@ -74,11 +74,17 @@ export default function HandleFixed() {
       });
   };
 
+  
+
   useEffect(() => {
     fetchFixeds();
     fetchHistory();
   }, []);
 
+
+
+
+  
   const firstPendingIndex = fixeds.findIndex(f => f.status === 2);
 
   return (

@@ -34,12 +34,12 @@ class SLL{
         tail=nullptr;
         count=0;
     }
-    string insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,int balance,string accountNumber,string status);
+    string insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,long long int balance,string accountNumber,string status);
     string* validateLogin(string email, string password);//linearr search for email and password
     void deleteNodeByEmail(string email);
     Node* getNodeByEmail(string email);
     Node* getNodeByAccountNumber(string accountNumber);
-    bool sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,int amount);
+    bool sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,long long int amount);
     string generateToken();
     string generateRandomInteger(int length);
     void insertToken(string email);
@@ -52,7 +52,7 @@ class SLL{
     void updatePassword(string email, string newPassword);
     int getTotalBalance();
     int getUserCount();
-    void setTotalBalance(int balance);
+    void setTotalBalance(long long int balance);
     bool isActive(string accountNumber);
     bool isActiveByEmail(string email);
     bool isEmpty();

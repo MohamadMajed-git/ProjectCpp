@@ -40,6 +40,24 @@ export default function Home() {
     return new Intl.NumberFormat('en-EG', {style: 'currency', currency: 'EGP'}).format(amount);
   }
 
+  
+
+  ////
+useEffect(() => {
+  let ran = false;
+  const checkLoanAndFixedTime = () => {
+    if (ran) return;
+    ran = true;
+
+    axiosClient.post("/check-loan-time").catch(console.error);
+    axiosClient.post("/check-fixed-time").catch(console.error);
+  };
+
+  checkLoanAndFixedTime();
+  const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
+  return () => clearInterval(interval);
+}, []);
+
 
   const quickActions = [
     { 

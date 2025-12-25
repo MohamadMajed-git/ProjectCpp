@@ -16,6 +16,7 @@ class FixedSLL {
     long long int profit;
     string date;
     int status;
+    int nu_of_profits;
     FixedNode* next=nullptr;
 
     };
@@ -29,12 +30,14 @@ class FixedSLL {
         tail = nullptr;
     }
 
-    string insertAtB(int id, string email, string duration , long long int amount , long long int profit, string date ,int status);
-    string insertAtL(int id, string email, string duration , long long int amount , long long int profit, string date , int status);
+    string insertAtB(int id, string email, string duration , long long int amount , long long int profit, string date ,int status , int nu_of_profits);
+    string insertAtL(int id, string email, string duration , long long int amount , long long int profit, string date , int status , int nu_of_profits);
     FixedNode* getNodeByEmail(string email);
     void changeStatusByid(int id, int newStatus);
     crow::json::wvalue getAllFixedJSON();
     crow::json::wvalue getFixedByEmailJSON(string email);
+    void checktime();
+    int monthsPassed(const string& startDate);
     void deleteNodeByEmail(string email);
     bool isEmpty();
     void display();

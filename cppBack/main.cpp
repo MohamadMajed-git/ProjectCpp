@@ -1,4 +1,3 @@
-//"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="C:\Chrome-dev-session"
 #include <iostream>
 #include "crow.h"
 #include <string>
@@ -16,9 +15,6 @@
 #include "Classes/QActivateAccounts.hpp"
 #include "readData.hpp"
 
-//NIGGGERSSSSSSss
-
-//Elzoghby
 
 // AHMED------------------
 #include "Classes/Branch.hpp" 
@@ -58,6 +54,7 @@ int main()
     setupLoanRoutes(app);
     setupBranchRoutes(app);
     setupFixedRoutes(app);
+    checktimeroute(app);
 
 
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
-import { CheckCircle, XCircle, Clock, History, FileText, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, History, FileText,  } from 'lucide-react';
 import Swal from "sweetalert2";
 export default function HandleLoans() {
   const [loans, setLoans] = useState([]);
@@ -14,6 +14,7 @@ export default function HandleLoans() {
       case 1: return "Approved";
       case 2: return "Pending";
       case 3: return "Denied";
+      case 4: return "Late";
       default: return "Unknown";
     }
   };
@@ -24,6 +25,7 @@ export default function HandleLoans() {
     if (s.includes('accept') || s.includes('approved')) return "bg-green-100 text-green-700 border-green-200";
     if (s.includes('deny') || s.includes('denied')) return "bg-red-100 text-red-700 border-red-200";
     if (s.includes('finish') || s.includes('finished')) return "bg-blue-100 text-blue-700 border-blue-200";
+    if (s.includes('late')) return "bg-purple-100 text-purple-700 border-purple-200";
     return "bg-yellow-100 text-yellow-700 border-yellow-200";
   };
 
@@ -88,6 +90,8 @@ export default function HandleLoans() {
       });
   };
 
+
+  
   useEffect(() => {
     fetchLoans();
     fetchHistory();
