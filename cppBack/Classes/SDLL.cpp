@@ -7,7 +7,7 @@
 
 using namespace std;
 
-string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,int balance,string accountNumber,string status="hold")
+string SLL::insertAtB(string name1, string name2, string nationalID, string birthdate, string email, string phone, string password, string address, string job, string accountType,string currentDate,long long int balance,string accountNumber,string status="hold")
 {
     Node *newNode = new Node();
     newNode->name1 = name1;
@@ -94,7 +94,6 @@ void SLL::deleteNodeByEmail(string email) {
         if (cur->email == email) {
             if (cur == head) {
                 head = cur->next;
-                
             } else {
                 prev->next = cur->next;
             }
@@ -132,7 +131,6 @@ SLL::Node* SLL::getNodeByEmail(string email)
 
 string SLL::generateToken()
 {
-    //! ref :https://stackoverflow.com/questions/19665818/generate-random-numbers-using-c11-random-library
     static random_device rd;
     static mt19937 gen(rd());
     static uniform_int_distribution<> dis(0,25);
@@ -148,7 +146,7 @@ string SLL::generateRandomInteger(int length)
     string numbers="0123456789";
     string result="";
     random_device rd;
-    mt19937 gen(rd());
+    mt19937 gen(rd()); //! ref :https://stackoverflow.com/questions/19665818/generate-random-numbers-using-c11-random-library
     uniform_int_distribution<> dis(0,numbers.size()-1);
     for(int i=0;i<length;i++){
         result+=numbers[dis(gen)];
@@ -203,7 +201,7 @@ SLL::Node* SLL::getNodeByAccountNumber(string accountNumber){
     return nullptr;
 }
 
-bool SLL::sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,int amount){
+bool SLL::sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,long long int amount){
     Node* senderNode=getNodeByAccountNumber(SenderAccountNumber);
     Node* receiverNode=getNodeByAccountNumber(ReceiverAccountNumber);
     if(senderNode==nullptr || receiverNode==nullptr){
@@ -285,7 +283,7 @@ int SLL::getTotalBalance(){
 int SLL::getUserCount(){
     return count;
 }
-void SLL::setTotalBalance(int balance){
+void SLL::setTotalBalance(long long int balance){
     senderBalance=balance;
 }
 

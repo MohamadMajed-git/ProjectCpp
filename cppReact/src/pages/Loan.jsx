@@ -18,6 +18,7 @@ export default function Loan() {
       case 1: return "Approved";
       case 2: return "Pending";
       case 3: return "Denied";
+      case 4: return "Late"; 
       default: return "Unknown";
     }
   };
@@ -57,6 +58,9 @@ export default function Loan() {
      else if (status.includes('finished')) {
       return "bg-blue-100 text-blue-800 border-blue-200";
     }
+      else if (status.includes('late')) {
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      }
     return "bg-gray-100 text-gray-800 border-gray-200";
   };
 
@@ -71,6 +75,35 @@ export default function Loan() {
 
   useEffect(() => {
     fetchLoanHistory();
+  }, []);
+
+      useEffect(() => {
+    if (!user?.email) return;
+
+    axiosClient
+      .post("/adman-home-data", { email: user.email })
+      .then(res => {
+        setData(res.data);
+        console.log(res);
+      })
+      .catch(err => console.error("Dashboard data error", err));
+  }, [user]);
+
+  // 🔁 Periodic loan & fixed deposit time check
+  useEffect(() => {
+    const checkLoanAndFixedTime = () => {
+      axiosClient.post("/check-loan-time")
+        .catch(err => console.error("Loan time check failed", err));
+    };
+
+    // Run immediately once
+    checkLoanAndFixedTime();
+
+    // Run every 5 minutes
+    const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
+
+    // Cleanup
+    return () => clearInterval(interval);
   }, []);
 
   return (

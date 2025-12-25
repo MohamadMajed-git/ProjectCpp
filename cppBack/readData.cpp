@@ -8,12 +8,12 @@ using namespace std;
 void readAllDataFromDatabase(){
     MYSQL_ROW row;
     MYSQL_RES* res;
-    int balance=0;
+    long long int balance=0;
     int qstate=mysql_query(conn,"SELECT fname, lname, nationalID, birthdate, email, phone, password, address, job, accountType, createAt,balance,accountNumber,status FROM users");
     if(!qstate){// all team member qstate will return 0 if the query is successful
         res=mysql_store_result(conn);
         while((row=mysql_fetch_row(res))){
-             balance=row[11]?std::stoi(row[11]):0;
+             balance=row[11]?stoll(row[11]):0;
             userList.insertAtB(
                 row[0],
                 row[1],
@@ -30,7 +30,6 @@ void readAllDataFromDatabase(){
                 row[12],
                 row[13]
             );
-          
         }
         
         mysql_free_result(res);
@@ -55,18 +54,18 @@ void readAllDataFromDatabase(){
         cout<<"Query activateAccounts  Execution Problem!2"<< mysql_error(conn) << endl;
     }
     qstate=mysql_query(conn,"SELECT id, senderAccount, receiverAccount, amount, date FROM transactions");
-    int totalBalance=0;
+    long long int totalBalance=0;
     if(!qstate){
         res=mysql_store_result(conn);
         while((row=mysql_fetch_row(res))){
             transactionList.insertTransaction(
-                stoi(row[0]),
+                stoll(row[0]),
                 row[1],
                 row[2],
-                stoi(row[3]),
+                stoll(row[3]),
                 row[4]
             );
-            totalBalance+=stoi(row[3]);
+            totalBalance+=stoll(row[3]);
         }
         userList.setTotalBalance(totalBalance);
         mysql_free_result(res);
@@ -129,7 +128,7 @@ void readAllFixedFromDatabase() {
     MYSQL_ROW row;
     MYSQL_RES* res;
 
-    int qstate = mysql_query(conn, "SELECT id, email, status, duration, amount, profit , fixed_date FROM Fixed");
+    int qstate = mysql_query(conn, "SELECT id, email, status, duration, amount, profit , fixed_date , number_of_profit FROM Fixed");
     
     if (!qstate) { // 0 means query successful
         res = mysql_store_result(conn);
@@ -141,9 +140,9 @@ void readAllFixedFromDatabase() {
             long long int amount = stoll(row[4]);        
             long long int profit = stoll(row[5]);  
             string date = row[6];
-            
+            int nu_of_profits = stoi(row[7]);
 
-            FixedSSL.insertAtL(id, email, duration, amount, profit, date, status);
+            FixedSSL.insertAtL(id, email, duration, amount, profit, date, status, nu_of_profits);
             if(status == 2){
             FixedQ.insert(id, email, duration, amount, profit, date, status);
             }

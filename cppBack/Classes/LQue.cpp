@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <random>
+#include <ctime>
 
 using namespace std;
 
@@ -160,7 +161,7 @@ crow::json::wvalue LoanQueue::getAllLoansJSON() {
         loan["loan_cost"] = temp->loan_cost;
         loan["date"] = temp->date;
 
-        loansList.push_back(std::move(loan));
+        loansList.push_back(move(loan));
         temp = temp->next;
     }
 
@@ -171,3 +172,5 @@ crow::json::wvalue LoanQueue::getAllLoansJSON() {
 int LoanQueue::getTotalLoanRequest() {
     return len;
 }
+
+
