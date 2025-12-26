@@ -45,6 +45,7 @@ export default function Home() {
   ////
 useEffect(() => {
   let ran = false;
+
   const checkLoanAndFixedTime = () => {
     if (ran) return;
     ran = true;
@@ -57,6 +58,7 @@ useEffect(() => {
   const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
   return () => clearInterval(interval);
 }, []);
+
 
 
   const quickActions = [

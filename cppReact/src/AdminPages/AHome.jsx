@@ -23,24 +23,22 @@ export default function AHome() {
   }, [user]);
 
   // 🔁 Periodic loan & fixed deposit time check
-  useEffect(() => {
-    const checkLoanAndFixedTime = () => {
-      axiosClient.post("/check-loan-time")
-        .catch(err => console.error("Loan time check failed", err));
+useEffect(() => {
+  let ran = false;
 
-      axiosClient.post("/check-fixed-time")
-        .catch(err => console.error("Fixed time check failed", err));
-    };
+  const checkLoanAndFixedTime = () => {
+    if (ran) return;
+    ran = true;
 
-    // Run immediately once
-    checkLoanAndFixedTime();
+    axiosClient.post("/check-loan-time").catch(console.error);
+    axiosClient.post("/check-fixed-time").catch(console.error);
+  };
 
-    // Run every 5 minutes
-    const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
+  checkLoanAndFixedTime();
+  const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
+  return () => clearInterval(interval);
+}, []);
 
-    // Cleanup
-    return () => clearInterval(interval);
-  }, []);
 
   const menuItems = [
     {

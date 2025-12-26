@@ -90,21 +90,22 @@ export default function Loan() {
   }, [user]);
 
   // 🔁 Periodic loan & fixed deposit time check
-  useEffect(() => {
-    const checkLoanAndFixedTime = () => {
-      axiosClient.post("/check-loan-time")
-        .catch(err => console.error("Loan time check failed", err));
-    };
+useEffect(() => {
+  let ran = false;
 
-    // Run immediately once
-    checkLoanAndFixedTime();
+  const checkLoanAndFixedTime = () => {
+    if (ran) return;
+    ran = true;
 
-    // Run every 5 minutes
-    const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
+    axiosClient.post("/check-loan-time").catch(console.error);
+    axiosClient.post("/check-fixed-time").catch(console.error);
+  };
 
-    // Cleanup
-    return () => clearInterval(interval);
-  }, []);
+  checkLoanAndFixedTime();
+  const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
+  return () => clearInterval(interval);
+}, []);
+
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-10 space-y-8">
