@@ -39,9 +39,3 @@ class LoanQueue {
     bool isEmpty();
     void display();
 };
-
-git add .
-git commit -m " "
-git push origin main
-git pull origin main
-git reset --soft HEAD~1

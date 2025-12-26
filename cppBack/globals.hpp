@@ -26,7 +26,7 @@ extern StackPassword stackPassword;
 extern LoanSLL LoanSSL;
 extern LoanQueue LoanQ;
 string currentDate();
-
+string dataForYossef();
 //Abdelsalam
 extern FixedSLL FixedSSL;
 extern FixedQueue FixedQ;

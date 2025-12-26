@@ -7,9 +7,9 @@ import { RouterProvider } from 'react-router-dom'
 import { ContextProvider } from './context/ContextProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <ContextProvider>
     <RouterProvider router={router}/>
     </ContextProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )

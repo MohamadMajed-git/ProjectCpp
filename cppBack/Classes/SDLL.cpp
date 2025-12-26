@@ -337,3 +337,26 @@ bool SLL::isActiveByEmail(string email){
     }
     return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+string SLL::getNodeByAccountNumberByEmail(string email){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            return cur->accountNumber;
+        }
+        cur=cur->next;
+    }
+    return "";
+}
