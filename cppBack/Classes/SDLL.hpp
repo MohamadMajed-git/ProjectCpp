@@ -52,6 +52,8 @@ class SLL{
     bool checkIfAdmin(string email);
     void updatePassword(string email, string newPassword);
     int getTotalBalance();
+    long long int getUserBalance(string email);
+    string getAccountnu(string email);
     int getUserCount();
     void setTotalBalance(long long int balance);
     bool isActive(string accountNumber);

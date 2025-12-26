@@ -152,6 +152,39 @@ crow::json::wvalue LoanSLL::getLoansByEmailJSON(string email) {
 
     return crow::json::wvalue(loansList);
 }
+
+bool LoanSLL::checkIfIdExit(int id) {
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->id == id) {
+            return true;
+        }
+        temp = temp->next;
+    }
+    return false;
+}
+int LoanSLL::getstates(int id) {
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->id == id) {
+            return temp->states;
+        }
+        temp = temp->next;
+    }
+    return -1; // not found
+}
+
+long long int LoanSLL::getLoanCostById(int id) {
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->id == id) {
+            return stoll(temp->loan_cost);
+        }
+        temp = temp->next;
+    }
+    return -1; // not found
+}
+
 void LoanSLL::checklate() {
     LoanNode* temp = head;
     time_t now = time(0);

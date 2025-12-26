@@ -557,6 +557,67 @@ void setupLoanRoutes(crow::SimpleApp &app)
 
 
 
+CROW_ROUTE(app,"/api/pay-loan")
+    .methods("POST"_method, "OPTIONS"_method)([](const crow::request &req) {
+        if (req.method == "OPTIONS"_method)
+            return crow::response(200);
+
+        auto data = crow::json::load(req.body);
+        if (!data)
+            return crow::response(400, "Invalid JSON");
+
+        string email = data.has("email") ? (string)data["email"].s() : "";
+        int loanId = data.has("loanId") ? (int)data["loanId"].i() : 0;
+
+        if (!userList.checkIfUserExist(email)) {
+            crow::json::wvalue err;
+            err["message"] = "User does not exist";
+            return crow::response(400, err);
+        }
+
+
+        if (!LoanSSL.checkIfIdExit(loanId)) {
+            crow::json::wvalue err;
+            err["message"] = "Loan ID not found";
+            return crow::response(400, err);
+        }
+         int state = LoanSSL.getstates(loanId);
+        if (state != 1 && state != 4) { // Only approved or late
+            crow::json::wvalue err;
+            err["message"] = "Loan is not payable";
+            return crow::response(400, err);
+        }
+
+        long long int amount = LoanSSL.getLoanCostById(loanId);
+        if(amount <= 0){
+            crow::json::wvalue err;
+            err["message"] = "Invalid loan amount";
+            return crow::response(400, err);
+        }
+
+        if (userList.getUserBalance(email) < amount) {
+            crow::json::wvalue err;
+            err["message"] = "Insufficient balance to pay the loan";
+            return crow::response(400, err);
+        }
+        string accountNo = userList.getAccountnu(email);
+        string query2 = "UPDATE loans SET states = 0 WHERE id = " + to_string(loanId);
+        string qeuery = "UPDATE users SET balance = balance - " + to_string(amount) + " WHERE email = '" + email + "'";
+        string query3 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('" + accountNo + "','BANK',  " + to_string(amount) + ", '" + currentDate() + "')";
+        if(mysql_query(conn, qeuery.c_str()) == 0 && mysql_query(conn, query2.c_str()) == 0 && mysql_query(conn, query3.c_str()) == 0){   
+            userList.sendMoney( accountNo, "BANK", amount);  
+            transactionList.insertTransaction(mysql_insert_id(conn), accountNo, "BANK", amount, currentDate());  
+            LoanSSL.changestates(loanId, 0); // paid
+        } else {
+            crow::json::wvalue err;
+            err["message"] = mysql_error(conn);
+            return crow::response(400, err);
+        }
+
+
+        return crow::response(200, "Loan paid successfully");
+    });
+
 
     CROW_ROUTE(app, "/api/admin/get-all-loans")
         .methods("GET"_method)([]()

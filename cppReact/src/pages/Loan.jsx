@@ -11,6 +11,12 @@ export default function Loan() {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  /* ===== ADDED STATE ===== */
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [selectedLoanId, setSelectedLoanId] = useState(null);
+  const [paying, setPaying] = useState(false);
+  const [paymentMessage, setPaymentMessage] = useState(null); // { type: 'success' | 'error', text: string }
+  /* ====================== */
 
   const getStateText = (state) => {
     switch (state) {
@@ -23,27 +29,20 @@ export default function Loan() {
     }
   };
 
-
   const handleSubmit = () => {
     const money = Number(moneyRef.current?.value);
     const duration = durationRef.current?.value;
-
 
     if (!money || money < 1000) {
       alert("Loan amount must be at least 1000");
       return;
     }
 
-    axiosClient
-      .post("submit-loan-request", {
-        moneyOfLoan: money,
-        duration: duration,
-        email: user.email,
-      })
-      .then((res) => {
-        console.log(res.data);
-        fetchLoanHistory();
-      });
+    axiosClient.post("submit-loan-request", {
+      moneyOfLoan: money,
+      duration: duration,
+      email: user.email,
+    }).then(() => fetchLoanHistory());
   };
 
   const getStatusBadgeStyles = (statusText) => {
@@ -54,16 +53,13 @@ export default function Loan() {
       return "bg-green-100 text-green-800 border-green-200";
     } else if (status.includes('reject') || status.includes('denied')) {
       return "bg-red-100 text-red-800 border-red-200";
-    }
-     else if (status.includes('finished')) {
+    } else if (status.includes('finished')) {
       return "bg-blue-100 text-blue-800 border-blue-200";
+    } else if (status.includes('late')) {
+      return "bg-purple-100 text-purple-800 border-purple-200";
     }
-      else if (status.includes('late')) {
-        return "bg-purple-100 text-purple-800 border-purple-200";
-      }
     return "bg-gray-100 text-gray-800 border-gray-200";
   };
-
 
   const fetchLoanHistory = () => {
     setLoading(true);
@@ -73,44 +69,62 @@ export default function Loan() {
       .finally(() => setLoading(false));
   };
 
+  /* ===== ADDED FUNCTIONS ===== */
+  const openPayModal = (loanId) => {
+    setSelectedLoanId(loanId);
+    setShowPayModal(true);
+  };
+
+  const confirmPayLoan = () => {
+    if (!selectedLoanId) return;
+
+    setPaying(true);
+    axiosClient
+      .post("/pay-loan", {
+        loanId: selectedLoanId,
+        email: user.email,
+      })
+      .then(() => {
+        setShowPayModal(false);
+        setSelectedLoanId(null);
+        fetchLoanHistory();
+        setPaymentMessage({ type: "success", text: "Loan payment successful!" });
+      })
+      .catch(() => {
+        setPaymentMessage({ type: "error", text: "Failed to pay the loan. Try again." });
+      })
+      .finally(() => setPaying(false));
+  };
+  /* =========================== */
+
   useEffect(() => {
     fetchLoanHistory();
   }, []);
 
-      useEffect(() => {
+  useEffect(() => {
     if (!user?.email) return;
 
-    axiosClient
-      .post("/adman-home-data", { email: user.email })
-      .then(res => {
-        setData(res.data);
-        console.log(res);
-      })
-      .catch(err => console.error("Dashboard data error", err));
+    axiosClient.post("/adman-home-data", { email: user.email }).catch(console.error);
   }, [user]);
 
-  // 🔁 Periodic loan & fixed deposit time check
-useEffect(() => {
-  let ran = false;
+  useEffect(() => {
+    let ran = false;
 
-  const checkLoanAndFixedTime = () => {
-    if (ran) return;
-    ran = true;
+    const checkLoanAndFixedTime = () => {
+      if (ran) return;
+      ran = true;
+      axiosClient.post("/check-loan-time").catch(console.error);
+      axiosClient.post("/check-fixed-time").catch(console.error);
+    };
 
-    axiosClient.post("/check-loan-time").catch(console.error);
-    axiosClient.post("/check-fixed-time").catch(console.error);
-  };
-
-  checkLoanAndFixedTime();
-  const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
-  return () => clearInterval(interval);
-}, []);
-
+    checkLoanAndFixedTime();
+    const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 md:p-10 space-y-8">
 
-      {}
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="bg-indigo-600 p-6 flex items-center gap-3 text-white">
           <div className="p-2 bg-white/20 rounded-lg">
@@ -125,7 +139,6 @@ useEffect(() => {
         <div className="p-6 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 
-            {}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700">Amount</label>
               <div className="relative">
@@ -141,7 +154,6 @@ useEffect(() => {
               </div>
             </div>
 
-            {}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700">Duration</label>
               <div className="relative">
@@ -160,7 +172,6 @@ useEffect(() => {
               </div>
             </div>
 
-            {}
             <button
               onClick={handleSubmit}
               className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
@@ -173,7 +184,6 @@ useEffect(() => {
         </div>
       </div>
 
-      {}
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-4">
           <History className="text-gray-500" />
@@ -198,6 +208,7 @@ useEffect(() => {
                     <th className="p-4">Amount</th>
                     <th className="p-4">Date</th>
                     <th className="p-4 text-center">Status</th>
+                    <th className="p-4 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -214,6 +225,18 @@ useEffect(() => {
                             {statusText}
                           </span>
                         </td>
+                        <td className="p-4 text-center">
+                          {(loan.states === 1 || loan.states === 4) ? (
+                            <button
+                              onClick={() => openPayModal(loan.id)}
+                              className="px-3 py-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg"
+                            >
+                              Pay Loan
+                            </button>
+                          ) : (
+                            <span className="text-gray-300 text-xs">—</span>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}
@@ -223,6 +246,47 @@ useEffect(() => {
           )}
         </div>
       </div>
+
+      {showPayModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-lg font-bold mb-2">Confirm Loan Payment</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to pay this loan?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowPayModal(false)}
+                disabled={paying}
+                className="px-4 py-2 rounded-lg bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmPayLoan}
+                disabled={paying}
+                className="px-4 py-2 rounded-lg bg-indigo-600 text-white disabled:opacity-50"
+              >
+                {paying ? "Paying..." : "Pay Loan"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== Payment Success/Error GUI ===== */}
+      {paymentMessage && (
+        <div className={`fixed bottom-5 right-5 z-50 px-6 py-4 rounded-xl shadow-lg text-white
+          ${paymentMessage.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
+          {paymentMessage.text}
+          <button
+            onClick={() => setPaymentMessage(null)}
+            className="ml-4 font-bold underline text-white"
+          >
+            Close
+          </button>
+        </div>
+      )}
 
     </div>
   );

@@ -276,6 +276,16 @@ bool SLL::checkPassword(string email, string password){
     return false;
 }
 
+string SLL::getAccountnu(string email){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            return cur->accountNumber;
+        }
+        cur=cur->next;
+    }
+    return "";
+}
 
 int SLL::getTotalBalance(){
     return senderBalance;
@@ -285,6 +295,16 @@ int SLL::getUserCount(){
 }
 void SLL::setTotalBalance(long long int balance){
     senderBalance=balance;
+}
+long long int SLL::getUserBalance(string email){
+    Node* cur=head;
+    while(cur!=nullptr){
+        if(cur->email==email){
+            return cur->balance;
+        }
+        cur=cur->next;
+    }
+    return -1; // not found
 }
 
 crow::json::wvalue SLL::getAllData(){

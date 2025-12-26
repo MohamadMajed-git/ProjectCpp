@@ -33,6 +33,9 @@ class LoanSLL {
     LoanNode* getNodeByEmail(string email);
     crow::json::wvalue getAllLoansJSON();
     crow::json::wvalue getLoansByEmailJSON(string email);
+    bool checkIfIdExit(int id);
+    long long int getLoanCostById(int id);
+    int getstates(int id);
     void deleteNodeByEmail(string email);
     void changestates(int id, int newState);
     bool isEmpty();
