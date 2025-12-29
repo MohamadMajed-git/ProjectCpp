@@ -59,14 +59,14 @@ useEffect(() => {
     <div className="flex justify-between items-center px-5 py-4 bg-slate-50/50 border-b border-slate-100">
       <div className="flex items-center gap-2">
         <Bell size={18} className="text-slate-600" />
-        <span className="font-bold text-slate-800 text-sm">التنبيهات</span>
+        <span className="font-bold text-slate-800 text-sm">Notifications</span>
       </div>
       <button
         onClick={markAllRead}
         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded-md transition-colors flex items-center gap-1.5 text-xs font-medium"
       >
         <CheckCheck size={14} />
-        تحديد الكل كمقروء
+       make all read
       </button>
     </div>
 
@@ -75,14 +75,14 @@ useEffect(() => {
       {loading && (
         <div className="flex flex-col items-center justify-center py-10 gap-2">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <p className="text-slate-400 text-xs">جاري التحميل...</p>
+          <p className="text-slate-400 text-xs">Loading...</p>
         </div>
       )}
 
       {!loading && list.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-slate-400">
           <BellOff size={40} strokeWidth={1.5} className="mb-2 opacity-20" />
-          <p className="text-sm">لا توجد تنبيهات جديدة</p>
+          <p className="text-sm">No new notifications</p>
         </div>
       )}
 
@@ -116,7 +116,7 @@ useEffect(() => {
           {n.states === 0 && (
             <button 
               className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-blue-600"
-              title="تحديد كمقروء"
+              title="Mark as read"
             >
               <CheckCheck size={16} />
             </button>
@@ -128,7 +128,7 @@ useEffect(() => {
     {/* Footer */}
     <div className="bg-slate-50/50 p-3 text-center border-t border-slate-100">
         <button className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors">
-            عرض كافة التنبيهات
+            Show all notifications
         </button>
     </div>
   </div>
