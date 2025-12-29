@@ -8,6 +8,7 @@
 //yossef
 #include "Classes/LSLL.hpp"
 #include "Classes/LQue.hpp"
+#include "Classes/notfisll.hpp"
 
 //AHMED
 #include "Classes/Branch.hpp"
@@ -23,6 +24,7 @@ extern QActivateAccounts activateAccounts;
 extern TransactionDLL transactionList;
 extern StackPassword stackPassword;
 //yossef 
+extern notfsll NotfiSLL;
 extern LoanSLL LoanSSL;
 extern LoanQueue LoanQ;
 string currentDate();

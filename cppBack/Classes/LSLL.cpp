@@ -232,10 +232,19 @@ void LoanSLL::checklate() {
             if (difftime(now, dueTime) > 0) {
                     long long cost = stoll(temp->loan_cost);
                     long long lateCost = cost + (cost * 8 /100);
-                    string query ="UPDATE loans SET states = 4, loan_cost = " +to_string(lateCost) +" WHERE id = " + to_string(temp->id);                
+                    string query ="UPDATE loans SET states = 4, loan_cost = " +to_string(lateCost) +" WHERE id = " + to_string(temp->id);
+                string message = "Dear customer, our records indicate that your loan payment was not received on time. " 
+                  "A late fee of 1.08% (" + to_string(lateCost) + ") has been added to your outstanding amount. " 
+                  "Please make the payment at your earliest convenience to avoid further charges.";
+                string query2 = "INSERT INTO notifications (user, message, status) VALUES ('" + temp->email + "', '" + message + "', 0)";             
                     if(mysql_query(conn, query.c_str()) == 0) {
                         temp->loan_cost = to_string(lateCost);
                         temp->states = 4;
+                        cout << message << endl;
+                        if(mysql_query(conn, query2.c_str()) == 0)
+                        NotfiSLL.insertAtL(mysql_insert_id(conn), temp->email, message, 0);
+                        else
+                        cout << "Failed to insert notification for loan ID " << temp->id << ": " << mysql_error(conn) << endl;
                 } else {
                     cout << "Failed to update loan ID " << temp->id << ": " << mysql_error(conn) << endl;
                 }
@@ -248,4 +257,13 @@ void LoanSLL::checklate() {
     }
 
 
-
+string LoanSLL::getEmailById(int id) {
+    LoanNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->id == id) {
+            return temp->email;
+        }
+        temp = temp->next;
+    }
+    return ""; // not found
+}

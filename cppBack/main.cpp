@@ -32,6 +32,7 @@ StackPassword stackPassword;
 //yossef
 LoanSLL LoanSSL;
 LoanQueue LoanQ;
+notfsll NotfiSLL;
 
 //Abdelsalam
 FixedSLL FixedSSL;
@@ -46,7 +47,7 @@ int main()
     connectToDatabase();
     readAllDataFromDatabase();
     readAllLoansFromDatabase();
-    // readAllBranchesFromDatabase();
+    readAllNotificationsFromDatabase();
     readAllFixedFromDatabase();
     readAllBranchesForUser();
     crow::SimpleApp app; 
@@ -55,6 +56,7 @@ int main()
     setupBranchRoutes(app);
     setupFixedRoutes(app);
     checktimeroute(app);
+    setupNotfiRoutes(app);
 
 
 

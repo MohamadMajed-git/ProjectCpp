@@ -39,6 +39,7 @@ class SLL{
     void deleteNodeByEmail(string email);
     Node* getNodeByEmail(string email);
     Node* getNodeByAccountNumber(string accountNumber);
+    string getEmailbyAccountNumber(string accountNumber);
     bool sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,long long int amount);
     string generateToken();
     string generateRandomInteger(int length);

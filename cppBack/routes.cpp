@@ -273,6 +273,35 @@ void setupRoutes(crow::SimpleApp &app)
             response["message"] = "somthing went wrong" + errorMsg;
             return crow::response(400, response);
         }
+            string message1 = "Dear customer, your account has received a transfer of " 
+                            + to_string(amount) + 
+                            " from user account " + senderAccountNumber + 
+                            ". The amount has been successfully credited to your balance.";
+            
+            string message2 = "Dear customer, you have successfully sent an amount of " 
+                            + to_string(amount) + 
+                            " to account number " + receiverAccountNumber + 
+                            ". The transfer has been completed successfully.";
+            string email_sender =userList.getEmailbyAccountNumber(senderAccountNumber);
+            string email_receiver =userList.getEmailbyAccountNumber(receiverAccountNumber);
+
+            string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email_sender + "', '" + message2 + "', 0)";
+
+            string query3 = "INSERT INTO notifications (user, message, status) VALUES ('" + email_receiver + "', '" + message1 + "', 0)";
+
+                if(mysql_query(conn, query4.c_str()) == 0){
+
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email_sender, message2, 0);
+    } else {
+        cout << "❌ Send Money (sender) Notification insertion failed: " << mysql_error(conn) << endl;
+    }
+    if(mysql_query(conn, query3.c_str()) == 0){
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email_receiver, message1, 0);
+    } else {
+        cout << "❌ Send Money (receiver) Notification insertion failed: " << mysql_error(conn) << endl;
+    }
+
+
         query = "UPDATE users SET balance = balance + " + to_string(amount) + " WHERE accountNumber = '" + receiverAccountNumber + "'";
         if(mysql_query(conn, query.c_str()) != 0)
         {
@@ -604,10 +633,20 @@ CROW_ROUTE(app,"/api/pay-loan")
         string query2 = "UPDATE loans SET states = 0 WHERE id = " + to_string(loanId);
         string qeuery = "UPDATE users SET balance = balance - " + to_string(amount) + " WHERE email = '" + email + "'";
         string query3 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('" + accountNo + "','BANK',  " + to_string(amount) + ", '" + currentDate() + "')";
+        string message = "Dear customer, your payment of " + to_string(amount) + 
+                  " for loan ID " + to_string(loanId) + 
+                  " has been successfully received. Thank you for your prompt payment.";
+
+
+        string query7 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
         if(mysql_query(conn, qeuery.c_str()) == 0 && mysql_query(conn, query2.c_str()) == 0 && mysql_query(conn, query3.c_str()) == 0){   
             userList.sendMoney( accountNo, "BANK", amount);  
             transactionList.insertTransaction(mysql_insert_id(conn), accountNo, "BANK", amount, currentDate());  
             LoanSSL.changestates(loanId, 0); // paid
+                    if(mysql_query(conn, query7.c_str()) == 0)
+                    NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+                    else
+                    cout << "❌ Pay loan Notification insertion failed: " << mysql_error(conn) << endl;
         } else {
             crow::json::wvalue err;
             err["message"] = mysql_error(conn);
@@ -673,6 +712,14 @@ CROW_ROUTE(app,"/api/pay-loan")
     string query2 = "UPDATE users SET balance = balance + " + to_string(moneyInt) +" WHERE email = '" + email + "'";
     
     string query3 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('BANK', '" + accountNo + "', " + money + ", '" + currentDate() + "')";
+        string message = "Dear customer, we are pleased to inform you that your loan with ID " 
+                        + to_string(id) + 
+                        " has been successfully approved. The loan amount will be processed according to the agreed terms.";
+
+
+        string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
+
+
 
     if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0 && mysql_query(conn,query3.c_str())==0){   
     transactionList.insertTransaction(transactionId, "BANK", accountNo, moneyInt, currentDate());  
@@ -680,6 +727,12 @@ CROW_ROUTE(app,"/api/pay-loan")
     LoanQ.changestates(id, 1); // approveds
     LoanSSL.changestates(id, 1); // approveds
     LoanQ.remove();
+
+    if(mysql_query(conn, query4.c_str()) == 0){
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+    } else {
+        cout << "❌ Loan approval Notification insertion failed: " << mysql_error(conn) << endl;
+    }
 
         return crow::response(200, "State updated");
         }
@@ -703,11 +756,26 @@ CROW_ROUTE(app,"/api/pay-loan")
 
     int id = data["id"].i();
     string query = "UPDATE loans SET states = 3 WHERE id = " + to_string(id);
+    string message = "Dear customer, we regret to inform you that your loan application with ID " 
+                 + to_string(id) + 
+                 " has not been approved at this time. Please contact customer support for further information.";
+    string email = LoanSSL.getEmailById(id);
+    if(email.empty()) {
+        return crow::response(400, "Loan ID not found");
+    }
+
+    string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
+
     if(mysql_query(conn,query.c_str())==0){   
 
     LoanQ.changestates(id, 3); // deny
     LoanSSL.changestates(id, 3); // deny
     LoanQ.remove();
+    if(mysql_query(conn, query4.c_str()) == 0){
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+    } else {
+        cout << "❌ Loan denial Notification insertion failed: " << mysql_error(conn) << endl;
+    }
         return crow::response(200, "State updated");
 
         }
@@ -826,13 +894,24 @@ void setupFixedRoutes(crow::SimpleApp &app)
             response["status"] = "error";
             response["message"] = "Transaction failed .....YOU DON'T HAVE ENOUGH BALANCE";
             return crow::response(400, response);
-        }           
+        }
+        string messageApproved = "Dear customer, we are pleased to inform you that your fixed deposit request with ID " 
+                            + to_string(id) + 
+                            " has been successfully approved. The deposit is now active according to the agreed terms.";
+
+        string queryApproved = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + messageApproved + "', 0)";
+
         
     if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){               
     transactionList.insertTransaction(transactionId,  accountNo,"BANK", amountInt, currentDate());
     FixedQ.changestatus(id, 1); // approveds
     FixedSSL.changeStatusByid(id, 1); // approveds
     FixedQ.remove();
+    if(mysql_query(conn, queryApproved.c_str()) == 0){
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, messageApproved, 0);
+    } else {
+        cout << "❌ Fixed deposit approval Notification insertion failed: " << mysql_error(conn) << endl;
+    }
 
         return crow::response(200, "State updated");
         
@@ -854,14 +933,30 @@ void setupFixedRoutes(crow::SimpleApp &app)
 
     auto data = crow::json::load(req.body);
     if (!data) return crow::response(400, "Invalid JSON");
-
+    
     int id = data["id"].i();
     string query = "UPDATE Fixed SET status = 3 WHERE id = " + to_string(id);
+
+    string messageDenied = "Dear customer, we regret to inform you that your fixed deposit request with ID " 
+                       + to_string(id) + 
+                       " has not been approved at this time. Please contact customer support for further details.";
+    string email = FixedSSL.getEmailById(id);
+    if(email.empty()) {
+        return crow::response(400, "Fixed deposit ID not found");
+    }
+    string queryDenied = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + messageDenied + "', 0)";
+
+
     if(mysql_query(conn,query.c_str())==0){   
 
     FixedQ.changestatus(id, 3); // deny
     FixedSSL.changeStatusByid(id, 3); // deny
     FixedQ.remove();
+    if(mysql_query(conn, queryDenied.c_str()) == 0){
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, messageDenied, 0);
+    } else {
+        cout << "❌ Fixed deposit denial Notification insertion failed: " << mysql_error(conn) << endl;
+    }
         return crow::response(200, "State updated");
 
         }
@@ -1003,4 +1098,45 @@ void checktimeroute(crow::SimpleApp& app){
     });
 
 }
-    
+
+void setupNotfiRoutes(crow::SimpleApp& app){
+    CROW_ROUTE(app, "/api/client/get-notifications")
+    .methods("GET"_method)([](const crow::request &req){
+        auto email = req.url_params.get("email");
+        if (!email) return crow::response(400, "Missing email");
+        return crow::response(200, NotfiSLL.getNotfiByEmailJSON(email));
+    });
+
+    CROW_ROUTE(app, "/api/notifications/read")
+    .methods("POST"_method)([](const crow::request &req){
+        auto data = crow::json::load(req.body);
+        if (!data) return crow::response(400, "Invalid JSON");
+        int id = data["id"].i();
+        string query = "UPDATE notifications SET status = 1 WHERE id = " + to_string(id);
+        if(mysql_query(conn, query.c_str()) == 0){
+            NotfiSLL.changestates(id , 1);
+        } else {
+            crow::json::wvalue err;
+            err["message"] = mysql_error(conn);
+            return crow::response(400, err);
+        }
+        return crow::response(200, "Notification marked as read");
+        
+    });
+
+    CROW_ROUTE(app, "/api/notifications/read-all")
+    .methods("POST"_method)([](const crow::request &req){
+        auto data = crow::json::load(req.body);
+        if (!data) return crow::response(400, "Invalid JSON");
+        string email = data["email"].s();
+        string query = "UPDATE notifications SET status = 1 WHERE user = '" + email + "'";
+        if(mysql_query(conn, query.c_str()) == 0){
+            NotfiSLL.changeallstates(email , 1);
+        } else {
+            crow::json::wvalue err;
+            err["message"] = mysql_error(conn);
+            return crow::response(400, err);
+        }
+        return crow::response(200, "Notifications marked as read");
+    });
+}

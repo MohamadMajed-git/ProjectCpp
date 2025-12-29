@@ -201,6 +201,19 @@ SLL::Node* SLL::getNodeByAccountNumber(string accountNumber){
     return nullptr;
 }
 
+string SLL::getEmailbyAccountNumber(string accountNumber){
+    Node *cur = head;
+    while (cur != nullptr)
+    {
+        if (cur->accountNumber == accountNumber)
+        {
+            return cur->email;
+        }
+        cur = cur->next;
+    }
+    return "";
+}
+
 bool SLL::sendMoney(string SenderAccountNumber,string ReceiverAccountNumber,long long int amount){
     Node* senderNode=getNodeByAccountNumber(SenderAccountNumber);
     Node* receiverNode=getNodeByAccountNumber(ReceiverAccountNumber);

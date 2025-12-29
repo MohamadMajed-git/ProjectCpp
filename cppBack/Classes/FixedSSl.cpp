@@ -232,7 +232,10 @@ void FixedSLL::checktime() {
 
             string query3 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) "
                             "VALUES ('BANK', '" + accountNumber + "', " +
-                            to_string(totalProfitToPay) + ", '" + currentDate() + "')";
+                            to_string(totalProfitToPay) + ", '" + currentDate() + "')"; 
+            string message = "Dear customer, your fixed profit has been credited. Total profit amount: " + to_string(totalProfitToPay);
+            string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + temp->email + "', '" + message + "', 0)";
+
 
             if (mysql_query(conn, query.c_str()) == 0 &&
                 mysql_query(conn, query2.c_str()) == 0 &&
@@ -243,6 +246,10 @@ void FixedSLL::checktime() {
                                                    "BANK", accountNumber,
                                                    totalProfitToPay, currentDate());
                 userList.sendMoney("BANK", accountNumber, totalProfitToPay);
+                if(mysql_query(conn, query4.c_str()) == 0)
+                NotfiSLL.insertAtB(mysql_insert_id(conn), temp->email, message, 0);
+                else
+                cout << "❌ Profit Notification insertion failed: " << mysql_error(conn) << endl;
             }
             else {
                 cout << "❌ Profit transaction failed: " << mysql_error(conn) << endl;
@@ -258,6 +265,14 @@ void FixedSLL::checktime() {
                                 "VALUES ('BANK', '" + accountNumber + "', " +
                                 to_string(temp->amount) + ", '" + currentDate() + "')";
 
+                string message2 = "Dear customer, your fixed deposit with ID " + to_string(temp->id) + 
+                                " has matured. The amount of " + to_string(temp->amount) + 
+                                " has been successfully returned to your account.";
+
+
+                string query7 = "INSERT INTO notifications (user, message, status) VALUES ('" + temp->email + "', '" + message2 + "', 0)";
+
+
                 if (mysql_query(conn, query4.c_str()) == 0 &&
                     mysql_query(conn, query5.c_str()) == 0 &&
                     mysql_query(conn, query6.c_str()) == 0) {
@@ -267,6 +282,10 @@ void FixedSLL::checktime() {
                                                        "BANK", accountNumber,
                                                        temp->amount, currentDate());
                     userList.sendMoney("BANK", accountNumber, temp->amount);
+                    if(mysql_query(conn, query7.c_str()) == 0)
+                    NotfiSLL.insertAtB(mysql_insert_id(conn), temp->email, message2, 0);
+                    else
+                    cout << "❌ Maturity Notification insertion failed: " << mysql_error(conn) << endl;
                 }
                 else {
                     cout << "❌ Maturity transaction failed: " << mysql_error(conn) << endl;
@@ -302,7 +321,16 @@ int FixedSLL::monthsPassed(const string& startDate) {
     return max(0, months); // ensures the last month is counted
 }
 
-
+string FixedSLL::getEmailById(int id) {
+    FixedNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->id == id) {
+            return temp->email;
+        }
+        temp = temp->next;
+    }
+    return ""; // not found
+}
 
 
 

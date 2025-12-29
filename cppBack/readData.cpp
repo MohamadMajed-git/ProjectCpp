@@ -221,3 +221,28 @@ void readAllBranchesForUser()
         cout << "Read branches error: " << mysql_error(conn) << endl;
     }
 }
+
+
+void readAllNotificationsFromDatabase() {
+    MYSQL_ROW row;
+    MYSQL_RES* res;
+
+    int qstate = mysql_query(conn, "SELECT id, user, message, status FROM notifications");
+    
+    if (!qstate) { // 0 means query successful
+        res = mysql_store_result(conn);
+        while ((row = mysql_fetch_row(res))) {
+            int id = stoi(row[0]);            
+            string email = row[1];            
+            string message = row[2];         
+            int states = stoi(row[3]);        
+
+            NotfiSLL.insertAtB(id, email, message, states);
+        }
+        mysql_free_result(res);
+        cout << "Notifications loaded successfully!" << endl;
+    }
+    else {
+        cout << "Notifications Execution Problem! " << mysql_error(conn) << endl;
+    }
+}

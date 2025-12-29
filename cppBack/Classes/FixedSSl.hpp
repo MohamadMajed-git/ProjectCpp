@@ -36,6 +36,7 @@ class FixedSLL {
     void changeStatusByid(int id, int newStatus);
     crow::json::wvalue getAllFixedJSON();
     crow::json::wvalue getFixedByEmailJSON(string email);
+    string getEmailById(int id);
     void checktime();
     int monthsPassed(const string& startDate);
     void deleteNodeByEmail(string email);
