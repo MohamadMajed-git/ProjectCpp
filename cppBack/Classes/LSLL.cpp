@@ -201,7 +201,7 @@ void LoanSLL::checklate() {
 
             int year, month, day;
             sscanf(temp->date.c_str(), "%d-%d-%d", &year, &month, &day);
-
+            
 
 
                 int durationMonths = 0;

@@ -1093,7 +1093,85 @@ void checktimeroute(crow::SimpleApp& app){
 
     CROW_ROUTE(app, "/api/check-fixed-time").methods("POST"_method)
     ([](const crow::request& r) {
-        FixedSSL.checktime();    
+        crow::json::wvalue data = FixedSSL.checktime(); 
+        string temp=data.dump();
+        json::rvalue res = json::load(temp);
+        int size = res.size();
+        for(int i=0; i<size; i++){
+            int id = stoi(res[i]["id"].s());
+            string email = res[i]["email"].s();
+            string accountNumber = res[i]["accountNumber"].s();
+            int duration = stoi(res[i]["duration"].s());
+            long long int amount = stoll(res[i]["amount"].s());
+            long long int profit = stoll(res[i]["profit"].s());
+            int monthsPaid = stoi(res[i]["monthsPaid"].s());
+            int durationMonths = stoi(res[i]["durationMonths"].s());
+            int numberOfProfitsToPay = stoi(res[i]["numberOfProfitsToPay"].s());
+            long long int totalProfitPaid = stoll(res[i]["totalProfitPaid"].s());
+                        string query  = "UPDATE Fixed SET number_of_profit = " + to_string(totalProfitPaid) +
+                            " WHERE id = " + to_string(id);
+            string query2 = "UPDATE users SET balance = balance + " + to_string(totalProfitPaid) +
+                            " WHERE email = '" + email + "'";
+            string query3 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) "
+                            "VALUES ('BANK', '" + accountNumber + "', " +
+                            to_string(totalProfitPaid) + ", '" + currentDate() + "')"; 
+            string message = "Dear customer, your fixed profit has been credited. Total profit amount: " + to_string(totalProfitPaid);
+            string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
+            if (mysql_query(conn, query.c_str()) == 0 &&
+                mysql_query(conn, query2.c_str()) == 0 &&
+                mysql_query(conn, query3.c_str()) == 0) {
+
+                FixedSSL.chandeNuOfProfitsById(id, numberOfProfitsToPay);
+                transactionList.insertTransaction(mysql_insert_id(conn),
+                                                   "BANK", accountNumber,
+                                                   totalProfitPaid, currentDate());
+                userList.sendMoney("BANK", accountNumber, totalProfitPaid);
+                if(mysql_query(conn, query4.c_str()) == 0)
+                NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+                else
+                cout << "❌ Profit Notification insertion failed: " << mysql_error(conn) << endl;
+            }
+            else {
+                cout << "❌ Profit transaction failed: " << mysql_error(conn) << endl;
+            }
+                if (numberOfProfitsToPay == durationMonths) {
+
+                string query4 = "UPDATE Fixed SET status = 0 WHERE id = " + to_string(id);
+                string query5 = "UPDATE users SET balance = balance + " + to_string(amount) +
+                                " WHERE email = '" + email + "'";
+
+                string query6 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) "
+                                "VALUES ('BANK', '" + accountNumber + "', " +
+                                to_string(amount) + ", '" + currentDate() + "')";
+
+                string message2 = "Dear customer, your fixed deposit with ID " + to_string(id) + 
+                                " has matured. The amount of " + to_string(amount) + 
+                                " has been successfully returned to your account.";
+
+
+                string query7 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message2 + "', 0)";
+
+
+                if (mysql_query(conn, query4.c_str()) == 0 &&
+                    mysql_query(conn, query5.c_str()) == 0 &&
+                    mysql_query(conn, query6.c_str()) == 0) {
+
+                    FixedSSL.changeStatusByid(id, 0);
+                    transactionList.insertTransaction(mysql_insert_id(conn),
+                                                       "BANK", accountNumber,
+                                                       amount, currentDate());
+                    userList.sendMoney("BANK", accountNumber, amount);
+                    if(mysql_query(conn, query7.c_str()) == 0)
+                    NotfiSLL.insertAtB(mysql_insert_id(conn), email, message2, 0);
+                    else
+                    cout << "❌ Maturity Notification insertion failed: " << mysql_error(conn) << endl;
+                }
+                else {
+                    cout << "❌ Maturity transaction failed: " << mysql_error(conn) << endl;
+                }
+            }
+        }
+
         return crow::response(200, "ok");
     });
 

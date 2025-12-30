@@ -169,11 +169,11 @@ void FixedSLL::changeStatusByid(int id, int newStatus) {
 
 
 
-void FixedSLL::checktime() {
+crow::json::wvalue FixedSLL::checktime() {
     FixedNode* temp = head;
-
+    crow::json::wvalue result;
     while (temp != nullptr) {
-
+        crow::json::wvalue fixed;
         if (temp->status != 1) {
             temp = temp->next;
             continue;
@@ -223,82 +223,34 @@ void FixedSLL::checktime() {
             }
 
             long long int totalProfitToPay = monthlyProfit * monthToPay;
-
-            string query  = "UPDATE Fixed SET number_of_profit = " + to_string(numberOfProfitsToPay) +
-                            " WHERE id = " + to_string(temp->id);
-
-            string query2 = "UPDATE users SET balance = balance + " + to_string(totalProfitToPay) +
-                            " WHERE email = '" + temp->email + "'";
-
-            string query3 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) "
-                            "VALUES ('BANK', '" + accountNumber + "', " +
-                            to_string(totalProfitToPay) + ", '" + currentDate() + "')"; 
-            string message = "Dear customer, your fixed profit has been credited. Total profit amount: " + to_string(totalProfitToPay);
-            string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + temp->email + "', '" + message + "', 0)";
-
-
-            if (mysql_query(conn, query.c_str()) == 0 &&
-                mysql_query(conn, query2.c_str()) == 0 &&
-                mysql_query(conn, query3.c_str()) == 0) {
-
-                temp->nu_of_profits = numberOfProfitsToPay;
-                transactionList.insertTransaction(mysql_insert_id(conn),
-                                                   "BANK", accountNumber,
-                                                   totalProfitToPay, currentDate());
-                userList.sendMoney("BANK", accountNumber, totalProfitToPay);
-                if(mysql_query(conn, query4.c_str()) == 0)
-                NotfiSLL.insertAtB(mysql_insert_id(conn), temp->email, message, 0);
-                else
-                cout << "❌ Profit Notification insertion failed: " << mysql_error(conn) << endl;
-            }
-            else {
-                cout << "❌ Profit transaction failed: " << mysql_error(conn) << endl;
-            }
-
-            if (numberOfProfitsToPay == durationMonths) {
-
-                string query4 = "UPDATE Fixed SET status = 0 WHERE id = " + to_string(temp->id);
-                string query5 = "UPDATE users SET balance = balance + " + to_string(temp->amount) +
-                                " WHERE email = '" + temp->email + "'";
-
-                string query6 = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) "
-                                "VALUES ('BANK', '" + accountNumber + "', " +
-                                to_string(temp->amount) + ", '" + currentDate() + "')";
-
-                string message2 = "Dear customer, your fixed deposit with ID " + to_string(temp->id) + 
-                                " has matured. The amount of " + to_string(temp->amount) + 
-                                " has been successfully returned to your account.";
-
-
-                string query7 = "INSERT INTO notifications (user, message, status) VALUES ('" + temp->email + "', '" + message2 + "', 0)";
-
-
-                if (mysql_query(conn, query4.c_str()) == 0 &&
-                    mysql_query(conn, query5.c_str()) == 0 &&
-                    mysql_query(conn, query6.c_str()) == 0) {
-
-                    temp->status = 0;
-                    transactionList.insertTransaction(mysql_insert_id(conn),
-                                                       "BANK", accountNumber,
-                                                       temp->amount, currentDate());
-                    userList.sendMoney("BANK", accountNumber, temp->amount);
-                    if(mysql_query(conn, query7.c_str()) == 0)
-                    NotfiSLL.insertAtB(mysql_insert_id(conn), temp->email, message2, 0);
-                    else
-                    cout << "❌ Maturity Notification insertion failed: " << mysql_error(conn) << endl;
-                }
-                else {
-                    cout << "❌ Maturity transaction failed: " << mysql_error(conn) << endl;
-                }
-            }
+            fixed["id"] = temp->id;
+            fixed["email"] = temp->email;
+            fixed["accountNumber"] = accountNumber;
+            fixed["duration"] = temp->duration;
+            fixed["amount"] = temp->amount;
+            fixed["profit"] = temp->profit;
+            fixed["monthsPaid"] = numberOfProfitsToPay;
+            fixed["totalProfitPaid"] = totalProfitToPay;
+            fixed["durationMonths"] = durationMonths;
+            fixed["numberOfProfitsToPay"] = numberOfProfitsToPay;
+            result[to_string(temp->id)] = move(fixed);
         }
-
         temp = temp->next;
     }
+    return result;
 }
 
 
-
+void FixedSLL::chandeNuOfProfitsById(int id, int newNuOfProfits) {
+    FixedNode* cur = head;
+    while (cur != nullptr) {
+        if (cur->id == id) {
+            cur->nu_of_profits = newNuOfProfits;
+            return;
+        }
+        cur = cur->next;
+    }
+}
 
 
 int FixedSLL::monthsPassed(const string& startDate) {
