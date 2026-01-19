@@ -12,9 +12,15 @@ function Notifications({ email }) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false); // ✅ FIXED
+  const hasPostedRef = useState(false);
 
   const fetchNotifications = () => {
     setLoading(true);
+    if(hasPostedRef.current) {
+      setLoading(false);
+      return;
+    }
+    hasPostedRef.current = true;
     axiosClient
       .get(`client/get-notifications?email=${email}`) // ✅ FIXED
       .then((res) => setList(res.data || []))

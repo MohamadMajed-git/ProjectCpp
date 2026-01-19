@@ -9,7 +9,7 @@ import {
   FileText,
   Search,
 } from "lucide-react";
-
+import Swal from 'sweetalert2'
 const PROFIT_RATES = {
   "3 months": 0.05,
   "6 months": 0.08,
@@ -67,7 +67,25 @@ export default function Loan() {
         duration,
         email: user.email,
       })
-      .then(() => fetchHistory());
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Fixed deposit request submitted successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        fetchHistory();
+
+      })
+      .catch((err) => {
+        console.log(err);
+        const errormessage = err.response?.data?.message || err.message || "Something went wrong";
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errormessage,
+        });
+      });
   };
 
   const fetchHistory = () => {
