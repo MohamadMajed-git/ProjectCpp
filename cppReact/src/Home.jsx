@@ -20,6 +20,7 @@ export default function Home() {
   const {user,token}=useStateContext();
   const navigate = useNavigate();
   const [userData,setUserData]=useState(0);
+  const hasPostedRef = useState(false);
   useEffect(()=>{
   if(user&&user.nationalID=="123456789123"){
     navigate('/admin/admin-home')
@@ -42,21 +43,11 @@ export default function Home() {
 
   
 
-  ////
 useEffect(() => {
-  let ran = false;
-
-  const checkLoanAndFixedTime = () => {
-    if (ran) return;
-    ran = true;
-
+    if(hasPostedRef.current) return;
+    hasPostedRef.current = true;
     axiosClient.post("/check-loan-time").catch(console.error);
     axiosClient.post("/check-fixed-time").catch(console.error);
-  };
-
-  checkLoanAndFixedTime();
-  const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
-  return () => clearInterval(interval);
 }, []);
 
 

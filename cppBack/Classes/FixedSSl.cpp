@@ -171,7 +171,7 @@ void FixedSLL::changeStatusByid(int id, int newStatus) {
 
 crow::json::wvalue FixedSLL::checktime() {
     FixedNode* temp = head;
-    crow::json::wvalue result;
+    vector<crow::json::wvalue> nodesList;
     while (temp != nullptr) {
         crow::json::wvalue fixed;
         if (temp->status != 1) {
@@ -233,11 +233,13 @@ crow::json::wvalue FixedSLL::checktime() {
             fixed["totalProfitPaid"] = totalProfitToPay;
             fixed["durationMonths"] = durationMonths;
             fixed["numberOfProfitsToPay"] = numberOfProfitsToPay;
-            result[to_string(temp->id)] = move(fixed);
+            nodesList.push_back(move(fixed));
         }
         temp = temp->next;
     }
-    return result;
+    crow::json::wvalue finalResult;
+    finalResult = move(nodesList);
+    return finalResult;
 }
 
 

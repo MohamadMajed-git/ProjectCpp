@@ -858,7 +858,7 @@ void setupFixedRoutes(crow::SimpleApp &app)
     json::rvalue account = json::load(temp);
     string accountNo = account.has("accountNumber") ? (string)account["accountNumber"].s() : (string)"";
 
-           string  query = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('BANK', '" + accountNo + "', " + amount + ", '" + currentDate() + "')";
+           string  query = "INSERT INTO transactions (senderAccount, receiverAccount, amount, date) VALUES ('" + accountNo + "','BANK' , " + amount + ", '" + currentDate() + "')";
 
         if(mysql_query(conn, query.c_str()) != 0)
         {
@@ -869,7 +869,7 @@ void setupFixedRoutes(crow::SimpleApp &app)
             response["message"] = "somthing went wrong" + errorMsg;
             return crow::response(400, response);
         }
-                query = "SELECT id FROM transactions WHERE senderAccount = 'BANK' AND receiverAccount = '" + accountNo + "' AND amount = " + amount + " ORDER BY id DESC LIMIT 1";
+                query = "SELECT id FROM transactions WHERE senderAccount = '" + accountNo + "' AND receiverAccount = 'BANK' AND amount = " + amount + " ORDER BY id DESC LIMIT 1";
         if(mysql_query(conn, query.c_str())!= 0)
         {
             string errorMsg = mysql_error(conn);
@@ -1091,24 +1091,25 @@ void checktimeroute(crow::SimpleApp& app){
         return crow::response(200, "ok");
     });
 
-    CROW_ROUTE(app, "/api/check-fixed-time").methods("POST"_method)
+    CROW_ROUTE(app, "/api/check-fixed-time").methods("POST"_method, "OPTIONS"_method)
     ([](const crow::request& r) {
+        if (r.method == "OPTIONS"_method) return crow::response(200);
         crow::json::wvalue data = FixedSSL.checktime(); 
         string temp=data.dump();
         json::rvalue res = json::load(temp);
         int size = res.size();
         for(int i=0; i<size; i++){
-            int id = stoi(res[i]["id"].s());
+            int id = res[i]["id"].i();
             string email = res[i]["email"].s();
             string accountNumber = res[i]["accountNumber"].s();
-            int duration = stoi(res[i]["duration"].s());
-            long long int amount = stoll(res[i]["amount"].s());
-            long long int profit = stoll(res[i]["profit"].s());
-            int monthsPaid = stoi(res[i]["monthsPaid"].s());
-            int durationMonths = stoi(res[i]["durationMonths"].s());
-            int numberOfProfitsToPay = stoi(res[i]["numberOfProfitsToPay"].s());
-            long long int totalProfitPaid = stoll(res[i]["totalProfitPaid"].s());
-                        string query  = "UPDATE Fixed SET number_of_profit = " + to_string(totalProfitPaid) +
+            string duration = res[i]["duration"].s();
+            long long int amount = res[i]["amount"].i();
+            long long int profit = res[i]["profit"].i();
+            int monthsPaid = res[i]["monthsPaid"].i();
+            int durationMonths = res[i]["durationMonths"].i();
+            int numberOfProfitsToPay = res[i]["numberOfProfitsToPay"].i();
+            long long int totalProfitPaid = res[i]["totalProfitPaid"].i();
+                        string query  = "UPDATE Fixed SET number_of_profit = " + to_string(numberOfProfitsToPay) +
                             " WHERE id = " + to_string(id);
             string query2 = "UPDATE users SET balance = balance + " + to_string(totalProfitPaid) +
                             " WHERE email = '" + email + "'";
@@ -1171,11 +1172,14 @@ void checktimeroute(crow::SimpleApp& app){
                 }
             }
         }
+        crow::json::wvalue response;
+        response["message"] = "ok";
 
-        return crow::response(200, "ok");
+        return crow::response(200, response);
     });
 
 }
+
 
 void setupNotfiRoutes(crow::SimpleApp& app){
     CROW_ROUTE(app, "/api/client/get-notifications")
