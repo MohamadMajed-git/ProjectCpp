@@ -120,7 +120,8 @@ void setupRoutes(crow::SimpleApp &app)
                             {"job",userData[8]},
                             {"accountType",userData[9]},
                             {"accountNumber",userData[14]},
-                            {"createAt",userData[15]}
+                            {"createAt",userData[15]},
+                            {"status",userData[16]}
                         };
                         response["token"] = userData[10];
                         delete[] userData;

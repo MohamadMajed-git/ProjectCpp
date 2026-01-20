@@ -59,7 +59,7 @@ string* SLL::validateLogin(string email, string password)
         if (cur->email == email && cur->password == password)
         {
             cur->token = generateToken();
-            string *lst=new string[16];
+            string *lst=new string[17];
             lst[0]=(string)cur->name1;
             lst[1]=(string)cur->name2;
             lst[2]=(string)cur->nationalID;
@@ -76,6 +76,7 @@ string* SLL::validateLogin(string email, string password)
             lst[13]=to_string(cur->balance);
             lst[14]=(string)cur->accountNumber;
             lst[15]=(string)cur->createAt;
+            lst[16]=(string)cur->status;
             return lst;
            
         }

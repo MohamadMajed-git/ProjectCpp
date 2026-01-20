@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ShieldAlert, History, Building2, KeyRound, LayoutDashboard, HandCoins } from "lucide-react";
+import { ShieldAlert, History, Building2, KeyRound, LayoutDashboard, HandCoins ,Users} from "lucide-react";
 import { useEffect, useState } from "react";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../context/ContextProvider";
@@ -42,6 +42,14 @@ useEffect(() => {
 
   const menuItems = [
     {
+      title: "User Accounts",
+      path: "/admin/all-users-data",
+      icon: <Users size={32} />,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+      description: "View and manage user accounts"
+    }
+    ,{
       title: "Holded Accounts",
       path: "/admin/holded-accounts",
       icon: <ShieldAlert size={32} />,
