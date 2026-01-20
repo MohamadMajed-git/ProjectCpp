@@ -227,7 +227,7 @@ void readAllNotificationsFromDatabase() {
     MYSQL_ROW row;
     MYSQL_RES* res;
 
-    int qstate = mysql_query(conn, "SELECT id, user, message, status FROM notifications");
+    int qstate = mysql_query(conn, "SELECT id, user, message, status, createdAt FROM notifications");
     
     if (!qstate) { // 0 means query successful
         res = mysql_store_result(conn);
@@ -236,8 +236,9 @@ void readAllNotificationsFromDatabase() {
             string email = row[1];            
             string message = row[2];         
             int states = stoi(row[3]);        
+            string date = row[4];
 
-            NotfiSLL.insertAtB(id, email, message, states);
+            NotfiSLL.insertAtB(id, email, message, states, date);
         }
         mysql_free_result(res);
         cout << "Notifications loaded successfully!" << endl;

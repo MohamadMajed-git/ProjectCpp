@@ -24,7 +24,7 @@ export default function Home() {
   useEffect(()=>{
   if(user&&user.nationalID=="123456789123"){
     navigate('/admin/admin-home')
-  }
+  }  
   },[])
   useEffect(()=>{
     axiosClient.post("/get-user-data",{

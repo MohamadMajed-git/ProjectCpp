@@ -119,7 +119,8 @@ void setupRoutes(crow::SimpleApp &app)
                             {"address",userData[7]},
                             {"job",userData[8]},
                             {"accountType",userData[9]},
-                            {"accountNumber",userData[14]}
+                            {"accountNumber",userData[14]},
+                            {"createAt",userData[15]}
                         };
                         response["token"] = userData[10];
                         delete[] userData;
@@ -285,18 +286,18 @@ void setupRoutes(crow::SimpleApp &app)
             string email_sender =userList.getEmailbyAccountNumber(senderAccountNumber);
             string email_receiver =userList.getEmailbyAccountNumber(receiverAccountNumber);
 
-            string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email_sender + "', '" + message2 + "', 0)";
+            string query4 = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email_sender + "', '" + message2 + "', 0, '" + currentDate() + "')";
 
-            string query3 = "INSERT INTO notifications (user, message, status) VALUES ('" + email_receiver + "', '" + message1 + "', 0)";
+            string query3 = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email_receiver + "', '" + message1 + "', 0, '" + currentDate() + "')";
 
                 if(mysql_query(conn, query4.c_str()) == 0){
 
-        NotfiSLL.insertAtB(mysql_insert_id(conn), email_sender, message2, 0);
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email_sender, message2, 0, currentDate());
     } else {
         cout << "❌ Send Money (sender) Notification insertion failed: " << mysql_error(conn) << endl;
     }
     if(mysql_query(conn, query3.c_str()) == 0){
-        NotfiSLL.insertAtB(mysql_insert_id(conn), email_receiver, message1, 0);
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email_receiver, message1, 0, currentDate());
     } else {
         cout << "❌ Send Money (receiver) Notification insertion failed: " << mysql_error(conn) << endl;
     }
@@ -638,13 +639,13 @@ CROW_ROUTE(app,"/api/pay-loan")
                   " has been successfully received. Thank you for your prompt payment.";
 
 
-        string query7 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
+        string query7 = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email + "', '" + message + "', 0, '" + currentDate() + "')";
         if(mysql_query(conn, qeuery.c_str()) == 0 && mysql_query(conn, query2.c_str()) == 0 && mysql_query(conn, query3.c_str()) == 0){   
             userList.sendMoney( accountNo, "BANK", amount);  
             transactionList.insertTransaction(mysql_insert_id(conn), accountNo, "BANK", amount, currentDate());  
             LoanSSL.changestates(loanId, 0); // paid
                     if(mysql_query(conn, query7.c_str()) == 0)
-                    NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+                    NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0, currentDate());
                     else
                     cout << "❌ Pay loan Notification insertion failed: " << mysql_error(conn) << endl;
         } else {
@@ -717,7 +718,7 @@ CROW_ROUTE(app,"/api/pay-loan")
                         " has been successfully approved. The loan amount will be processed according to the agreed terms.";
 
 
-        string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
+        string query4 = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email + "', '" + message + "', 0, '" + currentDate() + "')";
 
 
 
@@ -729,7 +730,7 @@ CROW_ROUTE(app,"/api/pay-loan")
     LoanQ.remove();
 
     if(mysql_query(conn, query4.c_str()) == 0){
-        NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0, currentDate());
     } else {
         cout << "❌ Loan approval Notification insertion failed: " << mysql_error(conn) << endl;
     }
@@ -764,7 +765,7 @@ CROW_ROUTE(app,"/api/pay-loan")
         return crow::response(400, "Loan ID not found");
     }
 
-    string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
+    string query4 = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email + "', '" + message + "', 0, '" + currentDate() + "')";
 
     if(mysql_query(conn,query.c_str())==0){   
 
@@ -772,7 +773,7 @@ CROW_ROUTE(app,"/api/pay-loan")
     LoanSSL.changestates(id, 3); // deny
     LoanQ.remove();
     if(mysql_query(conn, query4.c_str()) == 0){
-        NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0, currentDate());
     } else {
         cout << "❌ Loan denial Notification insertion failed: " << mysql_error(conn) << endl;
     }
@@ -899,7 +900,7 @@ void setupFixedRoutes(crow::SimpleApp &app)
                             + to_string(id) + 
                             " has been successfully approved. The deposit is now active according to the agreed terms.";
 
-        string queryApproved = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + messageApproved + "', 0)";
+        string queryApproved = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email + "', '" + messageApproved + "', 0, '" + currentDate() + "')";
 
         
     if(mysql_query(conn,query.c_str())==0 && mysql_query(conn,query2.c_str())==0){               
@@ -908,7 +909,7 @@ void setupFixedRoutes(crow::SimpleApp &app)
     FixedSSL.changeStatusByid(id, 1); // approveds
     FixedQ.remove();
     if(mysql_query(conn, queryApproved.c_str()) == 0){
-        NotfiSLL.insertAtB(mysql_insert_id(conn), email, messageApproved, 0);
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, messageApproved, 0, currentDate());
     } else {
         cout << "❌ Fixed deposit approval Notification insertion failed: " << mysql_error(conn) << endl;
     }
@@ -944,7 +945,7 @@ void setupFixedRoutes(crow::SimpleApp &app)
     if(email.empty()) {
         return crow::response(400, "Fixed deposit ID not found");
     }
-    string queryDenied = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + messageDenied + "', 0)";
+    string queryDenied = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email + "', '" + messageDenied + "', 0, '" + currentDate() + "')";
 
 
     if(mysql_query(conn,query.c_str())==0){   
@@ -953,7 +954,7 @@ void setupFixedRoutes(crow::SimpleApp &app)
     FixedSSL.changeStatusByid(id, 3); // deny
     FixedQ.remove();
     if(mysql_query(conn, queryDenied.c_str()) == 0){
-        NotfiSLL.insertAtB(mysql_insert_id(conn), email, messageDenied, 0);
+        NotfiSLL.insertAtB(mysql_insert_id(conn), email, messageDenied, 0, currentDate());
     } else {
         cout << "❌ Fixed deposit denial Notification insertion failed: " << mysql_error(conn) << endl;
     }
@@ -1117,7 +1118,7 @@ void checktimeroute(crow::SimpleApp& app){
                             "VALUES ('BANK', '" + accountNumber + "', " +
                             to_string(totalProfitPaid) + ", '" + currentDate() + "')"; 
             string message = "Dear customer, your fixed profit has been credited. Total profit amount: " + to_string(totalProfitPaid);
-            string query4 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message + "', 0)";
+            string query4 = "INSERT INTO notifications (user, message, status , createdAt) VALUES ('" + email + "', '" + message + "', 0, '" + currentDate() + "')";
             if (mysql_query(conn, query.c_str()) == 0 &&
                 mysql_query(conn, query2.c_str()) == 0 &&
                 mysql_query(conn, query3.c_str()) == 0) {
@@ -1128,7 +1129,7 @@ void checktimeroute(crow::SimpleApp& app){
                                                    totalProfitPaid, currentDate());
                 userList.sendMoney("BANK", accountNumber, totalProfitPaid);
                 if(mysql_query(conn, query4.c_str()) == 0)
-                NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0);
+                NotfiSLL.insertAtB(mysql_insert_id(conn), email, message, 0, currentDate());
                 else
                 cout << "❌ Profit Notification insertion failed: " << mysql_error(conn) << endl;
             }
@@ -1150,7 +1151,7 @@ void checktimeroute(crow::SimpleApp& app){
                                 " has been successfully returned to your account.";
 
 
-                string query7 = "INSERT INTO notifications (user, message, status) VALUES ('" + email + "', '" + message2 + "', 0)";
+                string query7 = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + email + "', '" + message2 + "', 0, '" + currentDate() + "')";
 
 
                 if (mysql_query(conn, query4.c_str()) == 0 &&
@@ -1163,7 +1164,7 @@ void checktimeroute(crow::SimpleApp& app){
                                                        amount, currentDate());
                     userList.sendMoney("BANK", accountNumber, amount);
                     if(mysql_query(conn, query7.c_str()) == 0)
-                    NotfiSLL.insertAtB(mysql_insert_id(conn), email, message2, 0);
+                    NotfiSLL.insertAtB(mysql_insert_id(conn), email, message2, 0, currentDate());
                     else
                     cout << "❌ Maturity Notification insertion failed: " << mysql_error(conn) << endl;
                 }

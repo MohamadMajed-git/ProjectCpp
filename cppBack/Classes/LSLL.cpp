@@ -236,13 +236,13 @@ void LoanSLL::checklate() {
                 string message = "Dear customer, our records indicate that your loan payment was not received on time. " 
                   "A late fee of 1.08% (" + to_string(lateCost) + ") has been added to your outstanding amount. " 
                   "Please make the payment at your earliest convenience to avoid further charges.";
-                string query2 = "INSERT INTO notifications (user, message, status) VALUES ('" + temp->email + "', '" + message + "', 0)";             
+                string query2 = "INSERT INTO notifications (user, message, status, createdAt) VALUES ('" + temp->email + "', '" + message + "', 0, '" + currentDate() + "')";             
                     if(mysql_query(conn, query.c_str()) == 0) {
                         temp->loan_cost = to_string(lateCost);
                         temp->states = 4;
                         cout << message << endl;
                         if(mysql_query(conn, query2.c_str()) == 0)
-                        NotfiSLL.insertAtL(mysql_insert_id(conn), temp->email, message, 0);
+                        NotfiSLL.insertAtL(mysql_insert_id(conn), temp->email, message, 0,currentDate());
                         else
                         cout << "Failed to insert notification for loan ID " << temp->id << ": " << mysql_error(conn) << endl;
                 } else {

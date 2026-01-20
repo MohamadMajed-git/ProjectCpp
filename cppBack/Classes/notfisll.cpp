@@ -9,12 +9,13 @@
 
 using namespace std;
 
-string notfsll::insertAtB(int id, string email,  string message ,int states) {
+string notfsll::insertAtB(int id, string email,  string message ,int states, string date) {
     NotfNode* newNode = new NotfNode();
     newNode->id = id;
     newNode->email = email;
     newNode->states = states;
     newNode->message = message;
+    newNode->date = date;
 
     if (isEmpty()) {
         head = newNode;
@@ -27,12 +28,13 @@ string notfsll::insertAtB(int id, string email,  string message ,int states) {
     return to_string(newNode->id);
 }
 
-string notfsll::insertAtL(int id, string email, string message, int states) {
+string notfsll::insertAtL(int id, string email, string message, int states, string date) {
     NotfNode* newNode = new NotfNode();
     newNode->id = id;
     newNode->email = email;
     newNode->states = states;
     newNode->message = message;
+    newNode->date = date;
 
     if (isEmpty()) {
         head = newNode;
@@ -55,6 +57,7 @@ crow::json::wvalue notfsll::getNotfiByEmailJSON(string email) {
             loan["id"] = temp->id;
             loan["states"] = temp->states;
             loan["message"] = temp->message;
+            loan["date"] = temp->date;
 
             loansList.push_back(move(loan));
         }

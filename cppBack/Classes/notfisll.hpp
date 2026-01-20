@@ -15,6 +15,7 @@ class notfsll {
     string email;
     string message;
     int states;
+    string date;
 
     NotfNode* next=nullptr;
     };
@@ -28,8 +29,8 @@ class notfsll {
         tail = nullptr;
     }
 
-    string insertAtB(int id, string email, string message, int states);
-    string insertAtL(int id, string email, string message, int states);
+    string insertAtB(int id, string email, string message, int states, string date);
+    string insertAtL(int id, string email, string message, int states, string date);
     crow::json::wvalue getNotfiByEmailJSON(string email);
     bool checkIfIdExit(int id);
     void changestates(int id, int newState);

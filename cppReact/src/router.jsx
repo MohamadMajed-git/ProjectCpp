@@ -20,6 +20,7 @@ import HandleLoans from "./AdminPages/HandleLoan";
 import Fixed from "./pages/Fixed";
 import HandleFixed from "./AdminPages/HandleFixed";
 import AllUsers from "./AdminPages/AllUsers";
+import Profile from "./pages/Profile";
 const router = createBrowserRouter([
 
     {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
             {
                 path: "fixed-request",
                 element: <Fixed />
+            },
+            {
+                path: "profile",
+                element: <Profile />
             }
         ]
     },

@@ -2,7 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
 import { useEffect, useState } from "react";
 import BankLogo from '../assets/BankLogo.png';
-import { ShieldCheck, Bell, Check, CheckCheck, BellOff, Info, Circle } from "lucide-react";
+import { ShieldCheck, Bell, Check, CheckCheck, BellOff, Info, Circle, ChevronDown,User, LogOut} from "lucide-react";
 import axios from "axios";
 import axiosClient from "../axiosClient";
 
@@ -115,7 +115,7 @@ useEffect(() => {
               )}
             </div>
             {/* Time Placeholder */}
-            <span className="text-[11px] text-slate-400 uppercase tracking-wider">منذ قليل</span>
+            <span className="text-[11px] text-slate-400 uppercase tracking-wider">{n.date}</span>
           </div>
 
           {/* Mark as read individual button - visible on hover */}
@@ -147,7 +147,8 @@ useEffect(() => {
 export default function DefaultLayout() {
   const navigate = useNavigate();
   const { setUser, setToken, user } = useStateContext();
-
+  const [toggleIcon,setToggleIcon]=useState(false);
+  const userInitial = user?.firstName?.[0]?.toUpperCase() || "U";
   const handleLogout = () => {
     setUser(null);
     setToken(null);
@@ -177,16 +178,72 @@ export default function DefaultLayout() {
             <h1 className="text-xl font-bold text-gray-800">User Panel</h1>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Notifications email={user?.email} />
 
-            <button
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg shadow-blue-200 transition-all active:scale-95"
-              onClick={handleLogout}
-            >
-              log out
-            </button>
+<div className="flex items-center gap-4">
+      <Notifications email={user?.email} />
+
+      <div className="relative">
+        
+        <button
+          onClick={() => setToggleIcon(!toggleIcon)}
+          className={`flex items-center gap-2 p-1 pr-3 rounded-full transition-all duration-200 border 
+            ${toggleIcon ? 'bg-gray-50 border-gray-300 ring-2 ring-gray-100' : 'bg-white border-transparent hover:bg-gray-50'}`}
+        >
+          <div className="w-9 h-9 flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm font-bold text-sm">
+            {userInitial}
           </div>
+          
+          <ChevronDown 
+            size={16} 
+            className={`text-gray-500 transition-transform duration-200 ${toggleIcon ? 'rotate-180' : ''}`} 
+          />
+        </button>
+
+        {toggleIcon && (
+          <>
+            <div 
+              className="fixed inset-0 z-10" 
+              onClick={() => setToggleIcon(false)}
+            ></div>
+
+            <div className="absolute right-0 top-12 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+              
+              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+                <p className="text-sm font-semibold text-gray-900 truncate">
+                  {user?.firstName || "User"}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {user?.email || "No email"}
+                </p>
+              </div>
+
+              <div className="p-2 flex flex-col gap-1">
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setToggleIcon(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <User size={18} className="text-gray-500" />
+                  Profile
+                </button>
+
+                <div className="h-px bg-gray-100 my-1 mx-2"></div>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  <LogOut size={18} />
+                  Log out
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
 
         </header>
       </div>
