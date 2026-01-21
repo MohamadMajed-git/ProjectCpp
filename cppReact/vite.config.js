@@ -9,13 +9,13 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
-    proxy: {
-      '/api': {
-        // target: 'http://localhost:10000', 
-        target:'https://projectcpp123.onrender.com/',
-        changeOrigin: true,
-        secure: false,
-      }
-    }
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:10000', 
+    //     // target:'https://projectcpp123.onrender.com/',
+    //     changeOrigin: true,
+    //     secure: false,
+    //   }
+    // }
   }
 })

@@ -1,3 +1,6 @@
+//start chrome --disable-web-security --user-data-dir="C:\TempChrome"
+
+
 #include <iostream>
 #include "crow.h"
 #include <string>
