@@ -810,8 +810,8 @@ void setupFixedRoutes(crow::SimpleApp &app)
                                                           return response(400, "Invalid JSON");
                                                       string email = data.has("email") ? (string)data["email"].s() : (string) "";
                                                       string duration = data.has("duration") ? (string)data["duration"].s() : (string) "";
-                                                      long long int profit = data.has("profit") ? (long long int)data["profit"] : 0;
-                                                      long long int totalamount = data.has("amount") ? (long long int)data["amount"] : 0;
+                                                      long long int profit = data.has("profit") ? data["profit"].i() : 0;
+                                                      long long int totalamount = data.has("amount") ? data["amount"].i() : 0;
 
                                                       if (!userList.checkIfUserExist(email))
                                                       {
