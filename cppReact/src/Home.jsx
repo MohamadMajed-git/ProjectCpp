@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useStateContext } from "./context/ContextProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axiosClient from "./axiosClient";
 import { 
   LayoutDashboard, 
@@ -22,7 +22,7 @@ export default function Home() {
   const {user, token} = useStateContext();
   const navigate = useNavigate();
   const [userData, setUserData] = useState(0);
-  const hasPostedRef = useState(false);
+  const hasPostedRef = useRef(false);
 
   useEffect(() => {
     if (user && user.nationalID == "123456789123") {
@@ -74,13 +74,6 @@ export default function Home() {
       color: "bg-emerald-600", 
       hover: "hover:bg-emerald-700",
     },
-    { 
-      label: "Change Password", 
-      path: "/change-password", 
-      icon: <Lock size={22} />, 
-      color: "bg-rose-700", 
-      hover: "hover:bg-rose-800",
-    },
     {
       label: "Request Fixed",
       path: "/fixed-request",
@@ -94,14 +87,20 @@ export default function Home() {
       icon: <Wallet size={22} />,
       color: "bg-indigo-700",
       hover: "hover:bg-indigo-800",
-    }
+    },
+    { 
+      label: "Change Password", 
+      path: "/change-password", 
+      icon: <Lock size={22} />, 
+      color: "bg-rose-700", 
+      hover: "hover:bg-rose-800",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-10 font-sans text-slate-800">
       <div className="max-w-6xl mx-auto space-y-8">
         
-        {/* Header Section */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 border-b border-slate-200 pb-6">
           <div className="flex items-center gap-5">
             <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
@@ -119,7 +118,6 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Quick Actions Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {quickActions.map((action, index) => (
             <button
@@ -135,10 +133,8 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
-          {/* Personal Details Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-full flex flex-col">
             <div className="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center gap-3">
               <UserCircle className="w-6 h-6 text-slate-600" />
@@ -180,7 +176,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Financial Account Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-full flex flex-col">
             <div className="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center gap-3">
               <Wallet className="w-6 h-6 text-emerald-700" />
@@ -188,7 +183,6 @@ export default function Home() {
             </div>
             
             <div className="p-8 space-y-8 flex-1 flex flex-col justify-center">
-               {/* Balance Card Design - CHANGED TO BLUE GRADIENT INSTEAD OF BLACK */}
                <div className="relative overflow-hidden p-8 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-900 text-white shadow-lg shadow-blue-200">
                   <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
                   <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-blue-400 opacity-20"></div>
@@ -223,7 +217,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Security Section - Light Mode Redesign */}
         <div className="mt-8 bg-white rounded-xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">

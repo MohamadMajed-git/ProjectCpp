@@ -37,7 +37,7 @@ export default function Loan() {
       alert("Loan amount must be at least 1000");
       return;
     }
-    if(user?.status !== "Active"){
+    if(user?.status !== "active"){
       function notActive(){
         Swal.fire({
           icon: 'warning',

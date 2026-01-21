@@ -225,10 +225,8 @@ void LoanSLL::checklate() {
             dueDate.tm_mon  = (month - 1) + durationMonths ; // ADD MONTHS
             dueDate.tm_mday = day;
 
-            // Normalize date (handles month overflow automatically)
             time_t dueTime = mktime(&dueDate);
 
-            // If current time is after due date → late
             if (difftime(now, dueTime) > 0) {
                     long long cost = stoll(temp->loan_cost);
                     long long lateCost = cost + (cost * 8 /100);
@@ -241,8 +239,8 @@ void LoanSLL::checklate() {
                         temp->loan_cost = to_string(lateCost);
                         temp->states = 4;
                         cout << message << endl;
-                        if(mysql_query(conn, query2.c_str()) == 0)
-                        NotfiSLL.insertAtL(mysql_insert_id(conn), temp->email, message, 0,currentDate());
+                        if(mysql_query(conn, query2.c_str()) == 0){
+                        NotfiSLL.insertAtB(mysql_insert_id(conn), temp->email, message, 0,currentDate());}
                         else
                         cout << "Failed to insert notification for loan ID " << temp->id << ": " << mysql_error(conn) << endl;
                 } else {

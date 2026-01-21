@@ -67,7 +67,7 @@ export default function Loan() {
       });
       return;
     }
-    if(user?.status !== "Active"){
+    if(user?.status !== "active"){
       function notActive(){
         Swal.fire({
           icon: 'warning',

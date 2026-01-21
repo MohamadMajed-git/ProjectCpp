@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ShieldAlert, History, Building2, KeyRound, LayoutDashboard, HandCoins ,Users} from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../context/ContextProvider";
 
@@ -8,7 +8,7 @@ export default function AHome() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const { user } = useStateContext();
-
+  const isPostedRef = useRef(false);
   // Fetch dashboard data
   useEffect(() => {
     if (!user?.email) return;
@@ -22,22 +22,12 @@ export default function AHome() {
       .catch(err => console.error("Dashboard data error", err));
   }, [user]);
 
-  // 🔁 Periodic loan & fixed deposit time check
-useEffect(() => {
-  let ran = false;
-
-  const checkLoanAndFixedTime = () => {
-    if (ran) return;
-    ran = true;
-
+  useEffect(() => {
+    if (isPostedRef.current) return;
+    isPostedRef.current = true;
     axiosClient.post("/check-loan-time").catch(console.error);
     axiosClient.post("/check-fixed-time").catch(console.error);
-  };
-
-  checkLoanAndFixedTime();
-  const interval = setInterval(checkLoanAndFixedTime, 5 * 60 * 1000);
-  return () => clearInterval(interval);
-}, []);
+  }, []);
 
 
   const menuItems = [
